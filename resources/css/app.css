@@ -23,21 +23,34 @@
     --color-zinc-900: #171717;
     --color-zinc-950: #0a0a0a;
 
-    --color-accent: var(--color-neutral-800);
-    --color-accent-content: var(--color-neutral-800);
-    --color-accent-foreground: var(--color-white);
+    /* ── VicioApp Brand Colors ── */
+    --color-vicio-50:  #f3eefa;
+    --color-vicio-100: #e4d5f5;
+    --color-vicio-200: #c9aaeb;
+    --color-vicio-300: #ad80e0;
+    --color-vicio-400: #8f55d4;
+    --color-vicio-500: #49197C;
+    --color-vicio-600: #3a146a;
+    --color-vicio-700: #2d0f4e;
+    --color-vicio-800: #1f0a37;
+    --color-vicio-900: #110520;
+    --color-vicio:     #49197C;
+
+    /* ── Flux accent = VicioApp purple ── */
+    --color-accent:          #49197C;
+    --color-accent-content:  #49197C;
+    --color-accent-foreground: #ffffff;
 }
 
 @layer theme {
     .dark {
-        --color-accent: var(--color-white);
-        --color-accent-content: var(--color-white);
-        --color-accent-foreground: var(--color-neutral-800);
+        --color-accent:           #8f55d4;
+        --color-accent-content:   #8f55d4;
+        --color-accent-foreground: #ffffff;
     }
 }
 
 @layer base {
-
     *,
     ::after,
     ::before,
@@ -52,7 +65,7 @@
 }
 
 [data-flux-label] {
-    @apply  !mb-0 !leading-tight;
+    @apply !mb-0 !leading-tight;
 }
 
 input:focus[data-flux-control],
@@ -61,6 +74,16 @@ select:focus[data-flux-control] {
     @apply outline-hidden ring-2 ring-accent ring-offset-2 ring-offset-accent-foreground;
 }
 
-/* \[:where(&)\]:size-4 {
-    @apply size-4;
-} */
+/* ── VicioApp utilidades globales ── */
+.vicio-gradient {
+    background: linear-gradient(135deg, #49197C 0%, #6B2BAF 50%, #8f55d4 100%);
+}
+
+.vicio-gradient-dark {
+    background: linear-gradient(135deg, #2d0f4e 0%, #49197C 100%);
+}
+
+/* Swipe card shadow */
+.swipe-card {
+    box-shadow: 0 20px 60px rgba(73, 25, 124, 0.3);
+}

@@ -10,7 +10,7 @@ new #[Title('Inicio')] class extends Component
     }
 }; ?>
 
-<x-layouts.app.sidebar>
+<x-layouts::app.sidebar>
     <flux:main class="min-h-screen bg-zinc-950">
         <div class="max-w-lg mx-auto px-4 py-10 flex flex-col items-center justify-center gap-8 text-center">
 
@@ -65,4 +65,4 @@ new #[Title('Inicio')] class extends Component
 
         </div>
     </flux:main>
-</x-layouts.app.sidebar>
+</x-layouts::app.sidebar>

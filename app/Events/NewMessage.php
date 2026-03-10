@@ -3,13 +3,17 @@
 namespace App\Events;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 use App\Models\Message;
+=======
+>>>>>>> c68b8aa (Segundo commit a empezar paso 5)
 =======
 >>>>>>> c68b8aa (Segundo commit a empezar paso 5)
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Broadcasting\PrivateChannel;
+<<<<<<< HEAD
 <<<<<<< HEAD
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
@@ -24,8 +28,10 @@ class NewMessage implements ShouldBroadcastNow
     ) {}
 
     /**
-     * Canal privado por match: private-chat.{match_id}
+     * Canal privado por match: private-chat.{party_match_id}
 =======
+=======
+>>>>>>> c68b8aa (Segundo commit a empezar paso 5)
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
@@ -46,13 +52,17 @@ class NewMessage
      * Get the channels the event should broadcast on.
      *
      * @return array<int, \Illuminate\Broadcasting\Channel>
+<<<<<<< HEAD
+>>>>>>> c68b8aa (Segundo commit a empezar paso 5)
+=======
 >>>>>>> c68b8aa (Segundo commit a empezar paso 5)
      */
     public function broadcastOn(): array
     {
         return [
 <<<<<<< HEAD
-            new PrivateChannel('chat.' . $this->message->match_id),
+<<<<<<< HEAD
+            new PrivateChannel('chat.' . $this->message->party_match_id),
         ];
     }
 
@@ -65,7 +75,7 @@ class NewMessage
     {
         return [
             'id'         => $this->message->id,
-            'match_id'   => $this->message->match_id,
+            'party_match_id'   => $this->message->party_match_id,
             'sender_id'  => $this->message->sender_id,
             'body'       => $this->message->body,
             'created_at' => $this->message->created_at->toISOString(),
@@ -73,8 +83,13 @@ class NewMessage
     }
 }
 =======
+=======
+>>>>>>> c68b8aa (Segundo commit a empezar paso 5)
             new PrivateChannel('channel-name'),
         ];
     }
 }
+<<<<<<< HEAD
+>>>>>>> c68b8aa (Segundo commit a empezar paso 5)
+=======
 >>>>>>> c68b8aa (Segundo commit a empezar paso 5)

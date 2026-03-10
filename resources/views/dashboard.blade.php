@@ -11,7 +11,8 @@ new #[Title('Inicio')] class extends Component
 }; ?>
 
 <x-layouts::app.sidebar>
-    <div class="max-w-lg mx-auto px-4 py-10 flex flex-col items-center gap-8">
+    <flux:main class="min-h-screen bg-zinc-950">
+        <div class="max-w-lg mx-auto px-4 py-10 flex flex-col items-center justify-center gap-8 text-center">
 
         {{-- Bienvenida --}}
         <div class="flex flex-col items-center gap-3 text-center">
@@ -59,7 +60,7 @@ new #[Title('Inicio')] class extends Component
 
             {{-- Escanear QR --}}
             <a
-                href="{{ route('scanner') }}"
+                href="{{ '#' }}"
                 wire:navigate
                 class="w-full vicio-gradient text-white font-semibold py-4 rounded-2xl flex items-center justify-center gap-3 hover:opacity-90 transition-opacity"
             >
@@ -107,5 +108,25 @@ new #[Title('Inicio')] class extends Component
             </div>
         @endif
 
-    </div>
+            {{-- Info card --}}
+            <div class="w-full grid grid-cols-3 gap-3">
+                <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-4 flex flex-col items-center gap-2">
+                    <flux:icon.heart class="size-6 text-vicio-400" />
+                    <span class="text-white font-bold text-lg">0</span>
+                    <span class="text-zinc-500 text-xs">Matches</span>
+                </div>
+                <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-4 flex flex-col items-center gap-2">
+                    <flux:icon.chat-bubble-left-right class="size-6 text-vicio-400" />
+                    <span class="text-white font-bold text-lg">0</span>
+                    <span class="text-zinc-500 text-xs">Chats</span>
+                </div>
+                <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-4 flex flex-col items-center gap-2">
+                    <flux:icon.fire class="size-6 text-vicio-400" />
+                    <span class="text-white font-bold text-lg">0</span>
+                    <span class="text-zinc-500 text-xs">Likes</span>
+                </div>
+            </div>
+
+        </div>
+    </flux:main>
 </x-layouts::app.sidebar>

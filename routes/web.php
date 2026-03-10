@@ -31,3 +31,9 @@ Route::prefix('party')->name('party.')->group(function () {
 });
 
 require __DIR__.'/settings.php';
+// ── Rutas de chat ──
+Route::middleware(['auth'])->prefix('chats')->name('chats.')->group(function () {
+    Route::view('/', 'pages.chat.index')->name('index');
+    Route::get('{match}', [\App\Http\Controllers\Chat\ChatController::class, 'show'])
+        ->name('show');
+});

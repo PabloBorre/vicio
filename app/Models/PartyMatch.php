@@ -29,7 +29,7 @@ class PartyMatch extends Model
 
     public function messages()
     {
-        return $this->hasMany(Message::class, 'match_id');
+        return $this->hasMany(Message::class, 'party_match_id');
     }
 
     public function otherUser(int $currentUserId): User
@@ -39,7 +39,7 @@ class PartyMatch extends Model
 
     public function lastMessage()
     {
-        return $this->hasOne(Message::class, 'match_id')->latestOfMany('created_at');
+        return $this->hasOne(Message::class, 'party_match_id')->latestOfMany('created_at');
     }
 
     public function unreadCount(int $userId): int

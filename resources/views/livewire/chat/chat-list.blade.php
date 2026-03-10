@@ -1,79 +1,81 @@
-<div class="min-h-screen bg-zinc-950">
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
+<head>
+    @include('partials.head')
+</head>
+<body class="min-h-screen bg-zinc-950">
 
-    {{-- Header --}}
-    <div class="sticky top-0 z-10 bg-zinc-950/95 backdrop-blur-sm border-b border-zinc-800 px-4 py-4">
-        <div class="max-w-lg mx-auto flex items-center justify-between">
-            <div>
-                <h1 class="text-white font-bold text-xl">Chats</h1>
-                <p class="text-zinc-500 text-xs">{{ $matches->count() }} conversaciones</p>
-            </div>
-        </div>
-    </div>
+<flux:sidebar sticky stashable class="border-e border-zinc-800 bg-zinc-950">
 
-    <div class="max-w-lg mx-auto px-4 py-4">
+    <flux:sidebar.header class="border-b border-zinc-800 py-4">
+        <x-app-logo :sidebar="true" href="{{ route('dashboard') }}" wire:navigate />
+    </flux:sidebar.header>
 
-        @if($matches->isEmpty())
-            {{-- Sin matches --}}
-            <div class="flex flex-col items-center gap-4 text-center py-20">
-                <div class="size-20 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="size-10 text-zinc-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                    </svg>
-                </div>
-                <div>
-                    <p class="text-white font-semibold text-lg">Sin conversaciones</p>
-                    <p class="text-zinc-500 text-sm mt-1">Cuando hagas match podrás chatear</p>
-                </div>
-            </div>
-        @else
-            <div class="space-y-1">
-                @foreach($matches as $match)
-                    <a
-                        href="{{ route('chat.show', $match['match_id']) }}"
-                        wire:navigate
-                        class="flex items-center gap-4 p-3 rounded-2xl hover:bg-zinc-900 transition-colors group"
-                    >
-                        {{-- Avatar --}}
-                        <div class="relative shrink-0">
-                            <img
-                                src="{{ $match['profile_photo_url'] }}"
-                                class="size-14 rounded-full object-cover"
-                                alt="{{ $match['username'] }}"
-                            />
-                            @if($match['unread'] > 0)
-                                <div class="absolute -top-0.5 -right-0.5 size-5 rounded-full bg-vicio flex items-center justify-center">
-                                    <span class="text-white text-[10px] font-bold">{{ $match['unread'] }}</span>
-                                </div>
-                            @endif
-                        </div>
+    <flux:sidebar.nav class="py-4">
+        <flux:sidebar.group :heading="__('Principal')" class="grid">
+            <flux:sidebar.item
+                icon="fire"
+                :href="route('dashboard')"
+                :current="request()->routeIs('dashboard')"
+                wire:navigate
+            >
+                {{ __('Inicio') }}
+            </flux:sidebar.item>
 
-                        {{-- Info --}}
-                        <div class="flex-1 min-w-0">
-                            <div class="flex items-center justify-between gap-2">
-                                <span class="text-white font-semibold truncate">{{ $match['username'] }}</span>
-                                @if($match['last_message_time'])
-                                    <span class="text-zinc-600 text-xs shrink-0">{{ $match['last_message_time'] }}</span>
-                                @endif
-                            </div>
-                            <div class="flex items-center justify-between gap-2 mt-0.5">
-                                <p @class([
-                                    'text-sm truncate',
-                                    'text-white font-medium' => $match['unread'] > 0,
-                                    'text-zinc-500'          => $match['unread'] === 0,
-                                ])>
-                                    {{ $match['last_message'] ?? 'Di hola 👋' }}
-                                </p>
-                                <span class="text-zinc-600 text-xs shrink-0">{{ $match['party_name'] }}</span>
-                            </div>
-                        </div>
+            <flux:sidebar.item
+                icon="chat-bubble-left-right"
+                :href="route('chats.index')"
+                :current="request()->routeIs('chats.*')"
+                wire:navigate
+            >
+                {{ __('Chats') }}
+            </flux:sidebar.item>
+        </flux:sidebar.group>
 
-                        {{-- Flecha --}}
-                        <svg xmlns="http://www.w3.org/2000/svg" class="size-4 text-zinc-700 group-hover:text-zinc-500 shrink-0 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                        </svg>
-                    </a>
-                @endforeach
-            </div>
+        @if(auth()->user()?->is_admin)
+            <flux:sidebar.group :heading="__('Administración')" class="grid">
+                <flux:sidebar.item
+                    icon="calendar-days"
+                    href="/admin/parties"
+                    :current="request()->is('admin/*')"
+                    wire:navigate
+                >
+                    {{ __('Fiestas') }}
+                </flux:sidebar.item>
+            </flux:sidebar.group>
         @endif
-    </div>
-</div>
+    </flux:sidebar.nav>
+
+    <flux:spacer />
+
+    <flux:sidebar.nav class="border-t border-zinc-800 py-2">
+        <flux:sidebar.item
+            icon="cog-6-tooth"
+            :href="route('settings.profile')"
+            :current="request()->routeIs('settings.*')"
+            wire:navigate
+        >
+            {{ __('Ajustes') }}
+        </flux:sidebar.item>
+
+        <x-desktop-user-menu class="w-full" />
+    </flux:sidebar.nav>
+
+</flux:sidebar>
+
+{{-- Header móvil --}}
+<flux:header class="lg:hidden border-b border-zinc-800 bg-zinc-950 py-3">
+    <flux:sidebar.toggle icon="bars-2" inset="left" />
+    <flux:spacer />
+    <x-app-logo href="{{ route('dashboard') }}" wire:navigate />
+    <flux:spacer />
+    <div class="size-8"></div>
+</flux:header>
+
+<flux:main class="bg-zinc-950">
+    {{ $slot }}
+</flux:main>
+
+@fluxScripts
+</body>
+</html>

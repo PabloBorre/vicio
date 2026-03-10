@@ -87,4 +87,6 @@ public function getAllMatches()
         ->orWhere('user2_id', $this->id)
         ->get();
 }
+
+
 }

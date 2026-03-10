@@ -1,13 +1,7 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>VicioApp — El Tinder de las Fiestas</title>
-    <link rel="icon" href="/favicon.ico" sizes="any">
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600,700" rel="stylesheet" />
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @include('partials.head')
 </head>
 <body class="min-h-screen vicio-gradient flex flex-col items-center justify-center px-6 text-white">
 
@@ -20,20 +14,20 @@
         </div>
         <div class="text-center">
             <h1 class="text-4xl font-bold tracking-tight">VicioApp</h1>
-            <p class="text-vicio-200 mt-1 text-lg">El Tinder de las fiestas</p>
+            <p class="text-white/60 mt-1 text-lg">El Tinder de las fiestas</p>
         </div>
     </div>
 
     {{-- Descripción --}}
-    <p class="text-center text-white/70 text-sm max-w-xs mb-10 leading-relaxed">
-        Escanea el QR de tu fiesta, conéctate con quienes están allí y descubre quien te gusta esta noche.
+    <p class="text-center text-white/60 text-sm max-w-xs mb-10 leading-relaxed">
+        Escanea el QR de tu fiesta, conéctate con quienes están allí y descubre quién te gusta esta noche.
     </p>
 
     {{-- Botones de acción --}}
     @auth
         <a
             href="{{ route('dashboard') }}"
-            class="w-full max-w-xs bg-white text-vicio-500 font-semibold text-center py-3.5 rounded-2xl shadow-lg hover:bg-vicio-50 transition-colors"
+            class="w-full max-w-xs bg-white text-vicio font-semibold text-center py-3.5 rounded-2xl shadow-lg hover:bg-vicio-50 transition-colors"
         >
             Ir al inicio
         </a>
@@ -41,7 +35,7 @@
         <div class="flex flex-col gap-3 w-full max-w-xs">
             <a
                 href="{{ route('login') }}"
-                class="w-full bg-white text-vicio-500 font-semibold text-center py-3.5 rounded-2xl shadow-lg hover:bg-vicio-50 transition-colors"
+                class="w-full bg-white text-vicio font-semibold text-center py-3.5 rounded-2xl shadow-lg hover:bg-vicio-50 transition-colors"
             >
                 Iniciar sesión
             </a>
@@ -59,5 +53,6 @@
     {{-- Footer --}}
     <p class="mt-12 text-white/30 text-xs">© {{ date('Y') }} VicioApp. Todos los derechos reservados.</p>
 
+    @fluxScripts
 </body>
 </html>

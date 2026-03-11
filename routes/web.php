@@ -14,8 +14,13 @@ Route::prefix('party')->name('party.')->group(function () {
     Route::get('{qr}', [\App\Http\Controllers\Party\PartyJoinController::class, 'show'])
         ->name('show');
 
+    // GET: mostrar formulario de registro (si no autenticado) o unir directamente (si autenticado)
     Route::get('{qr}/register', [\App\Http\Controllers\Party\PartyJoinController::class, 'register'])
         ->name('register');
+
+    // POST: procesar creación de cuenta + unirse a la fiesta
+    Route::post('{qr}/register', [\App\Http\Controllers\Party\PartyJoinController::class, 'store'])
+        ->name('store');
 
     Route::get('{qr}/waiting', [\App\Http\Controllers\Party\PartyJoinController::class, 'waiting'])
         ->middleware('auth')

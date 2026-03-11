@@ -106,7 +106,7 @@
                                     <div class="flex items-center gap-2 justify-end">
                                         {{-- Ver QR --}}
                                         <a
-                                            href="{{ $party->qr_url }}"
+                                            href="{{ route('admin.parties.qr', $party) }}"
                                             target="_blank"
                                             title="Ver enlace QR"
                                             class="size-8 rounded-lg bg-zinc-800 hover:bg-zinc-700 flex items-center justify-center transition-colors"

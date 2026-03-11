@@ -101,4 +101,9 @@ class AdminPartyController extends Controller
         return redirect()->route('admin.parties.index')
             ->with('success', 'Fiesta eliminada.');
     }
+
+    public function qr(Party $party)
+    {
+        return view('admin.parties.qr', compact('party'));
+    }
 }

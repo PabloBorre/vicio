@@ -8,29 +8,26 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::view('dashboard', 'dashboard')->name('dashboard');
 });
 
-// ── Rutas públicas de fiesta (no requieren auth) ──
+// ── Rutas públicas de fiesta ──
 Route::prefix('party')->name('party.')->group(function () {
 
-    // Escaneo del QR → muestra info de la fiesta y botón de registro
     Route::get('{qr}', [\App\Http\Controllers\Party\PartyJoinController::class, 'show'])
         ->name('show');
 
-    // Registro en la fiesta (formulario multi-paso)
     Route::get('{qr}/register', [\App\Http\Controllers\Party\PartyJoinController::class, 'register'])
         ->name('register');
 
-    // Sala de espera / countdown
     Route::get('{qr}/waiting', [\App\Http\Controllers\Party\PartyJoinController::class, 'waiting'])
         ->middleware('auth')
         ->name('waiting');
 
-    // Swipe (se activará en paso 5)
     Route::get('{qr}/swipe', [\App\Http\Controllers\Party\PartyJoinController::class, 'swipe'])
         ->middleware('auth')
         ->name('swipe');
 });
 
 require __DIR__.'/settings.php';
+
 // ── Rutas de chat ──
 Route::middleware(['auth'])->prefix('chats')->name('chats.')->group(function () {
     Route::view('/', 'pages.chat.index')->name('index');
@@ -38,6 +35,7 @@ Route::middleware(['auth'])->prefix('chats')->name('chats.')->group(function () 
         ->name('show');
 });
 
+// ── Admin ──
 Route::middleware(['auth', \App\Http\Middleware\IsAdmin::class])
     ->prefix('admin')
     ->name('admin.')
@@ -63,4 +61,8 @@ Route::middleware(['auth', \App\Http\Middleware\IsAdmin::class])
 
         Route::delete('parties/{party}', [\App\Http\Controllers\Admin\AdminPartyController::class, 'destroy'])
             ->name('parties.destroy');
+
+        // ── QR de una fiesta ──
+        Route::get('parties/{party}/qr', [\App\Http\Controllers\Admin\AdminPartyController::class, 'qr'])
+            ->name('parties.qr');
     });

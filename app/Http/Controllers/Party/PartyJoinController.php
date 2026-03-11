@@ -59,14 +59,19 @@ class PartyJoinController extends Controller
     /**
      * Sala de espera con countdown.
      */
-    public function waiting(string $qr)
+public function waiting(string $qr)
     {
         $party = Party::where('qr_code', $qr)->firstOrFail();
 
         // Si ya está activa, mandar al swipe directamente
-        if (in_array($party->status, ['active', 'countdown'])) {
-    return redirect()->route('party.swipe', $qr);
-}
+        if ($party->status === 'active') {
+            return redirect()->route('party.swipe', $qr);
+        }
+
+        // Si ha finalizado
+        if ($party->status === 'finished') {
+            abort(410, 'Esta fiesta ha finalizado.');
+        }
 
         // Verificar que el usuario es miembro
         if (!auth()->user()->parties()->where('party_id', $party->id)->exists()) {
@@ -74,7 +79,7 @@ class PartyJoinController extends Controller
         }
 
         return view('pages.party.waiting', compact('party'));
-    }
+}
 
     /**
      * Vista de swipe (se completará en paso 5).
@@ -98,11 +103,14 @@ class PartyJoinController extends Controller
      * Redirige al usuario al estado correcto de la fiesta.
      */
     private function redirectToPartyStage(Party $party, string $qr)
-    {
-        return match($party->status) {
-            'active'   => redirect()->route('party.swipe', $qr),
-            'finished' => abort(410, 'Esta fiesta ha finalizado.'),
-            default    => redirect()->route('party.waiting', $qr),
-        };
-    }
+{
+    return match(true) {
+        $party->status === 'active'   => redirect()->route('party.swipe', $qr),
+        $party->status === 'finished' => abort(410, 'Esta fiesta ha finalizado.'),
+        default                       => redirect()->route('party.waiting', $qr),
+        // cubre: registration, countdown (legacy), draft
+    };
+}
+
+
 }

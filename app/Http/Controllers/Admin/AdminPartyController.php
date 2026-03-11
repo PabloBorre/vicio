@@ -82,8 +82,7 @@ class AdminPartyController extends Controller
     public function updateStatus(Request $request, Party $party)
     {
         $request->validate([
-            'status' => 'required|in:draft,registration,countdown,active,finished',
-        ]);
+'status' => 'required|in:registration,active,finished',        ]);
 
         $party->update(['status' => $request->status]);
 

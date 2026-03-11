@@ -33,18 +33,15 @@
         @endif
 
         @php
-            $statusConfig = [
-                'draft'        => ['text' => 'Próximamente',     'class' => 'bg-zinc-800 text-zinc-400'],
-                'registration' => ['text' => 'Registro abierto', 'class' => 'bg-blue-900/50 text-blue-400'],
-                'countdown'    => ['text' => 'Cuenta atrás',     'class' => 'bg-yellow-900/50 text-yellow-400'],
-                'active'       => ['text' => 'En curso 🔥',      'class' => 'bg-vicio-900/50 text-vicio-300'],
-                'finished'     => ['text' => 'Finalizada',       'class' => 'bg-zinc-800 text-zinc-500'],
-            ];
-            $config = $statusConfig[$party->status] ?? $statusConfig['draft'];
-
-            $isMember = auth()->check()
-                && auth()->user()->parties()->where('party_id', $party->id)->exists();
-        @endphp
+    $statusConfig = [
+        'draft'        => ['text' => 'Próximamente',      'class' => 'bg-zinc-800 text-zinc-400'],
+        'registration' => ['text' => 'Registro abierto',  'class' => 'bg-green-900/50 text-green-400'],
+        'countdown'    => ['text' => 'Registro abierto',  'class' => 'bg-green-900/50 text-green-400'],  // mismo que registration
+        'active'       => ['text' => '¡En marcha!',       'class' => 'bg-vicio-900/50 text-vicio-300'],
+        'finished'     => ['text' => 'Finalizada',        'class' => 'bg-zinc-800 text-zinc-500'],
+    ];
+    $config = $statusConfig[$party->status] ?? $statusConfig['draft'];
+@endphp
 
         <span class="px-3 py-1 rounded-full text-xs font-medium {{ $config['class'] }}">
             {{ $config['text'] }}
@@ -54,33 +51,27 @@
             {{ $party->users()->count() }} personas ya se han unido
         </p>
 
-        <div class="w-full space-y-3">
-            @if($party->status === 'finished')
-                <p class="text-center text-zinc-500 text-sm">Esta fiesta ha finalizado.</p>
+        {{-- Botón de acción --}}
+<div class="w-full max-w-sm space-y-3">
+    @if($party->status === 'finished')
+        <p class="text-center text-zinc-500 text-sm">Esta fiesta ha finalizado.</p>
+    @elseif(in_array($party->status, ['registration', 'countdown', 'active']))
+        
+            href="{{ route('party.register', $party->qr_code) }}"
+            class="w-full vicio-gradient text-white font-semibold text-center py-4 rounded-2xl block hover:opacity-90 transition-opacity text-base"
+        >
+            🎉 ¡Quiero entrar!
+        </a>
 
-            @elseif($isMember)
-                <a
-                    href="{{ $party->status === 'active' ? route('party.swipe', $party->qr_code) : route('party.waiting', $party->qr_code) }}"
-                    class="w-full vicio-gradient text-white font-semibold text-center py-4 rounded-2xl block hover:opacity-90 transition-opacity"
-                >
-                    {{ $party->status === 'active' ? '🔥 Entrar al swipe' : '⏳ Ir a la sala de espera' }}
-                </a>
-
-            @else
-                <a
-                    href="{{ route('party.register', $party->qr_code) }}"
-                    class="w-full vicio-gradient text-white font-semibold text-center py-4 rounded-2xl block hover:opacity-90 transition-opacity"
-                >
-                    🎉 ¡Quiero entrar!
-                </a>
-
-                @auth
-                    <p class="text-center text-zinc-600 text-xs">
-                        Entrando como <span class="text-zinc-400">{{ auth()->user()->username ?? auth()->user()->name }}</span>
-                    </p>
-                @endauth
-            @endif
-        </div>
+        @auth
+            <p class="text-center text-zinc-600 text-xs">
+                Entrando como <span class="text-zinc-400">{{ auth()->user()->username ?? auth()->user()->name }}</span>
+            </p>
+        @endauth
+    @else
+        <p class="text-center text-zinc-500 text-sm">El registro no está abierto todavía.</p>
+    @endif
+</div>
 
     </div>
 

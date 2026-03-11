@@ -19,8 +19,7 @@
             <p class="text-zinc-400 text-sm font-medium">Cambiar estado manualmente</p>
             <form method="POST" action="{{ route('admin.parties.status', $party) }}" class="flex flex-wrap gap-2">
                 @csrf @method('PATCH')
-                @foreach(['draft' => 'Borrador', 'registration' => 'Registro', 'countdown' => 'Cuenta atrás', 'active' => 'Activa', 'finished' => 'Finalizada'] as $value => $label)
-                    <button
+                @foreach(['registration' => 'Registro', 'active' => 'Activa', 'finished' => 'Finalizada'] as $value => $label)                    <button
                         type="submit"
                         name="status"
                         value="{{ $value }}"

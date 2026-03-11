@@ -58,7 +58,6 @@
             </div>
 
             <div x-show="seconds <= 0" class="text-center space-y-2">
-                <div class="text-5xl">🎉</div>
                 <p class="text-white font-semibold">¡La fiesta está arrancando!</p>
                 <p class="text-zinc-500 text-sm">Redirigiendo...</p>
             </div>

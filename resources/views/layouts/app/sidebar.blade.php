@@ -32,6 +32,44 @@
             </flux:sidebar.item>
         </flux:sidebar.group>
 
+        {{-- Mis fiestas --}}
+        @auth
+            @php
+                $myParties = auth()->user()
+                    ->fresh()
+                    ->parties()
+                    ->whereIn('parties.status', ['draft','registration', 'countdown', 'active'])
+                    ->orderBy('starts_at')
+                    ->get();
+            @endphp
+
+            @if($myParties->isNotEmpty())
+                <flux:sidebar.group heading="Mis fiestas" class="grid">
+                    @foreach($myParties as $myParty)
+                        @php
+                            $partyRoute = $myParty->status === 'active'
+                                ? route('party.swipe', $myParty->qr_code)
+                                : route('party.waiting', $myParty->qr_code);
+
+                            $badge = match($myParty->status) {
+                                'active'    => '🟢',
+                                'countdown' => '⏳',
+                                'draft'     => '🎟️',
+                                default     => '🎟️',
+                            };
+                        @endphp
+                        <flux:sidebar.item
+                            :href="$partyRoute"
+                            :current="request()->is('party/' . $myParty->qr_code . '*')"
+                            wire:navigate
+                        >
+                            {{ $badge }} {{ Str::limit($myParty->name, 20) }}
+                        </flux:sidebar.item>
+                    @endforeach
+                </flux:sidebar.group>
+            @endif
+        @endauth
+
         @if(auth()->user()?->is_admin)
             <flux:sidebar.group :heading="__('Administración')" class="grid">
                 <flux:sidebar.item

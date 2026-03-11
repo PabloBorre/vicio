@@ -40,7 +40,7 @@ class AdminPartyController extends Controller
         }
 
         $data['created_by'] = auth()->id();
-        $data['status']     = 'draft';
+        $data['status']     = 'registration';
 
         Party::create($data);
 

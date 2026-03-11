@@ -15,6 +15,7 @@
     x-init="tick()"
     wire:poll.10s="checkPartyStatus"
 >
+    {{-- Logo --}}
     <div class="flex flex-col items-center gap-2 mb-10">
         <div class="size-14 rounded-full vicio-gradient flex items-center justify-center shadow-lg">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="size-7 fill-white">
@@ -25,6 +26,7 @@
         <p class="text-zinc-500 text-sm">Sala de espera</p>
     </div>
 
+    {{-- Countdown --}}
     <div class="w-full max-w-xs mb-10">
         <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-8 flex flex-col items-center gap-5">
 
@@ -63,6 +65,7 @@
         </div>
     </div>
 
+    {{-- Info --}}
     <div class="w-full max-w-xs space-y-3">
         <div class="bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 flex items-center justify-between">
             <div class="flex items-center gap-2 text-zinc-400 text-sm">

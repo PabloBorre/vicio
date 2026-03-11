@@ -64,9 +64,9 @@ class PartyJoinController extends Controller
         $party = Party::where('qr_code', $qr)->firstOrFail();
 
         // Si ya está activa, mandar al swipe directamente
-        if ($party->status === 'active') {
-            return redirect()->route('party.swipe', $qr);
-        }
+        if (in_array($party->status, ['active', 'countdown'])) {
+    return redirect()->route('party.swipe', $qr);
+}
 
         // Verificar que el usuario es miembro
         if (!auth()->user()->parties()->where('party_id', $party->id)->exists()) {

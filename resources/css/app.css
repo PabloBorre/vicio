@@ -38,8 +38,8 @@
     --color-zinc-900: #18181b;
     --color-zinc-950: #09090b;
 
-    --color-accent:             #0f0f0f;
-    --color-accent-content:     #0f0f0f;
+    --color-accent:             #6B2BAF;
+    --color-accent-content:     #6B2BAF;
     --color-accent-foreground:  #ffffff;
 }
 
@@ -55,8 +55,9 @@
 
 /* ════════════════════════════════════════════════════
    DARK MODE
-   Paleta con saltos visibles entre capas:
-   950 → #0a0212  fondo raíz (casi negro morado)
+   Fondo negro-morado. El morado predomina en superficies,
+   bordes y acentos. El texto es blanco/casi blanco.
+   950 → #0a0212  fondo raíz
    900 → #120520  sidebar / header
    800 → #1e0a38  cards / paneles
    700 → #2d1255  inputs / elementos interactivos
@@ -84,7 +85,7 @@ html.dark .bg-zinc-900 { background-color: #120520 !important; }
 html.dark .bg-zinc-800 { background-color: #1e0a38 !important; }
 html.dark .bg-zinc-700 { background-color: #2d1255 !important; }
 
-/* Bordes — más visibles */
+/* Bordes */
 html.dark .border-zinc-800 { border-color: #2d1255 !important; }
 html.dark .border-zinc-700 { border-color: #3d1870 !important; }
 html.dark .border-zinc-600 { border-color: #4e2288 !important; }
@@ -105,10 +106,10 @@ html.dark textarea[data-flux-control]:focus {
     box-shadow: 0 0 0 2px rgba(143, 85, 212, 0.3) !important;
 }
 
-/* Textos */
+/* Textos — legibles sobre fondos oscuros */
 html.dark .text-white        { color: #f0ebff !important; }
 html.dark .text-zinc-400     { color: #c4a8ee !important; }
-html.dark .text-zinc-500     { color: #9b6dd4 !important; }
+html.dark .text-zinc-500     { color: #a07dd4 !important; }
 html.dark .text-zinc-600     { color: #7a4db8 !important; }
 
 /* Hover states */
@@ -116,27 +117,21 @@ html.dark .hover\:bg-zinc-800:hover { background-color: #1e0a38 !important; }
 html.dark .hover\:bg-zinc-700:hover { background-color: #2d1255 !important; }
 html.dark .hover\:border-zinc-700:hover { border-color: #3d1870 !important; }
 
-/* Accent dark: negro */
+/* Accent */
 html.dark {
-    --color-accent:             #0f0f0f;
-    --color-accent-content:     #0f0f0f;
+    --color-accent:             #8f55d4;
+    --color-accent-content:     #8f55d4;
     --color-accent-foreground:  #ffffff;
 }
 
-/* Botones dark: negros */
-html.dark .vicio-gradient,
+/* ✅ vicio-gradient: morado en TODOS los modos */
 .vicio-gradient {
-    background: #0a0a0a !important;
+    background: linear-gradient(135deg, #49197C 0%, #8f55d4 100%) !important;
 }
 
 /* ════════════════════════════════════════════════════
    LIGHT MODE
-   Paleta lavanda con saltos visibles:
-   base   → #ede0ff  fondo raíz
-   900    → #e2d0ff  sidebar / header
-   800    → #d4bcfa  cards / paneles
-   700    → #c4a8f0  inputs
-   600    → #b090e8  bordes
+   Paleta lavanda con saltos visibles
    ════════════════════════════════════════════════════ */
 html:not(.dark),
 html:not(.dark) body {
@@ -192,16 +187,11 @@ html:not(.dark) .hover\:bg-zinc-800:hover { background-color: #d4bcfa !important
 html:not(.dark) .hover\:bg-zinc-700:hover { background-color: #c4a8f0 !important; }
 html:not(.dark) .hover\:border-zinc-700:hover { border-color: #9a78e0 !important; }
 
-/* Accent light: morado */
+/* Accent light */
 html:not(.dark) {
     --color-accent:             #6B2BAF;
     --color-accent-content:     #6B2BAF;
     --color-accent-foreground:  #ffffff;
-}
-
-/* Botones light: morado degradado */
-html:not(.dark) .vicio-gradient {
-    background: linear-gradient(135deg, #49197C 0%, #6B2BAF 100%) !important;
 }
 
 /* ── Flux fields ── */

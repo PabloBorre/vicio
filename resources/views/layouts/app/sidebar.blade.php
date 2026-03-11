@@ -3,7 +3,7 @@
 <head>
     @include('partials.head')
 </head>
-<body class="min-h-screen bg-zinc-950">
+<body class="h-dvh overflow-hidden bg-zinc-950">
 
 <flux:sidebar sticky stashable class="border-e border-zinc-800 bg-zinc-950">
 
@@ -72,7 +72,7 @@
     <div class="size-8"></div>
 </flux:header>
 
-<flux:main class="bg-zinc-950">
+<flux:main class="bg-zinc-950 !p-0">
     {{ $slot }}
 </flux:main>
 

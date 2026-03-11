@@ -11,11 +11,10 @@ new #[Title('Inicio')] class extends Component
 }; ?>
 
 <x-layouts::app.sidebar>
-    <flux:main class="min-h-screen bg-zinc-950">
-        <div class="max-w-lg mx-auto px-4 py-10 flex flex-col items-center justify-center gap-8 text-center">
+    <div class="h-full flex flex-col items-center justify-center px-4 py-8 gap-8 text-center">
 
         {{-- Bienvenida --}}
-        <div class="flex flex-col items-center gap-3 text-center">
+        <div class="flex flex-col items-center gap-3">
             <div class="size-16 rounded-full vicio-gradient flex items-center justify-center shadow-lg">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="size-8 fill-white">
                     <path d="M12 2C9.5 5 8 7.5 8 10c0 2.2 1.8 4 4 4s4-1.8 4-4c0-.5-.1-1-.2-1.4C17.2 10 18 11.9 18 14c0 3.3-2.7 6-6 6s-6-2.7-6-6c0-4 3-8 6-10zm0 10c-.6 0-1-.4-1-1 0-.9.5-1.8 1-2.5.5.7 1 1.6 1 2.5 0 .6-.4 1-1 1z"/>
@@ -30,7 +29,7 @@ new #[Title('Inicio')] class extends Component
         </div>
 
         {{-- Stats --}}
-        <div class="grid grid-cols-3 gap-3 w-full">
+        <div class="grid grid-cols-3 gap-3 w-full max-w-sm">
             @php
                 $userId = auth()->id();
                 $matches = \App\Models\PartyMatch::where('user1_id', $userId)->orWhere('user2_id', $userId)->count();
@@ -56,12 +55,11 @@ new #[Title('Inicio')] class extends Component
         </div>
 
         {{-- Acciones principales --}}
-        <div class="flex flex-col gap-3 w-full">
+        <div class="flex flex-col gap-3 w-full max-w-sm">
 
             {{-- Escanear QR --}}
             <a
                 href="{{ '#' }}"
-                wire:navigate
                 class="w-full vicio-gradient text-white font-semibold py-4 rounded-2xl flex items-center justify-center gap-3 hover:opacity-90 transition-opacity"
             >
                 <svg xmlns="http://www.w3.org/2000/svg" class="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -88,7 +86,7 @@ new #[Title('Inicio')] class extends Component
 
         {{-- Fiesta activa si existe --}}
         @if($currentParty = auth()->user()->currentParty)
-            <div class="w-full bg-vicio-900/30 border border-vicio-700/50 rounded-2xl p-4 flex items-center gap-4">
+            <div class="w-full max-w-sm bg-vicio-900/30 border border-vicio-700/50 rounded-2xl p-4 flex items-center gap-4">
                 <div class="size-10 rounded-full vicio-gradient flex items-center justify-center shrink-0">
                     <svg xmlns="http://www.w3.org/2000/svg" class="size-5 fill-white" viewBox="0 0 24 24">
                         <path d="M12 2C9.5 5 8 7.5 8 10c0 2.2 1.8 4 4 4s4-1.8 4-4c0-.5-.1-1-.2-1.4C17.2 10 18 11.9 18 14c0 3.3-2.7 6-6 6s-6-2.7-6-6c0-4 3-8 6-10z"/>
@@ -101,32 +99,12 @@ new #[Title('Inicio')] class extends Component
                 <a
                     href="{{ route('party.' . ($currentParty->status === 'active' ? 'swipe' : 'waiting'), $currentParty->qr_code) }}"
                     wire:navigate
-                    class="shrink-0 bg-vicio text-white text-xs font-semibold px-3 py-1.5 rounded-xl hover:opacity-90 transition-opacity"
+                    class="shrink-0 text-vicio-300 text-sm font-semibold hover:text-vicio-200 transition-colors"
                 >
-                    Entrar
+                    Entrar →
                 </a>
             </div>
         @endif
 
-            {{-- Info card --}}
-            <div class="w-full grid grid-cols-3 gap-3">
-                <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-4 flex flex-col items-center gap-2">
-                    <flux:icon.heart class="size-6 text-vicio-400" />
-                    <span class="text-white font-bold text-lg">0</span>
-                    <span class="text-zinc-500 text-xs">Matches</span>
-                </div>
-                <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-4 flex flex-col items-center gap-2">
-                    <flux:icon.chat-bubble-left-right class="size-6 text-vicio-400" />
-                    <span class="text-white font-bold text-lg">0</span>
-                    <span class="text-zinc-500 text-xs">Chats</span>
-                </div>
-                <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-4 flex flex-col items-center gap-2">
-                    <flux:icon.fire class="size-6 text-vicio-400" />
-                    <span class="text-white font-bold text-lg">0</span>
-                    <span class="text-zinc-500 text-xs">Likes</span>
-                </div>
-            </div>
-
-        </div>
-    </flux:main>
+    </div>
 </x-layouts::app.sidebar>

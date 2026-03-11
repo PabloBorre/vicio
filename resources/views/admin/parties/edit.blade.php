@@ -40,7 +40,7 @@
         <form method="POST" action="{{ route('admin.parties.update', $party) }}" enctype="multipart/form-data" class="space-y-5">
             @csrf @method('PUT')
 
-            @include('admin.parties._form')
+            @include('admin.parties.form')
 
             <div class="flex gap-3 pt-2">
                 <a href="{{ route('admin.parties.index') }}" wire:navigate

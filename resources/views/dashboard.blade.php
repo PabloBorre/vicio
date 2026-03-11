@@ -22,7 +22,7 @@ new #[Title('Inicio')] class extends Component
             </div>
             <div>
                 <h1 class="text-2xl font-bold text-white">
-                    Hola, {{ auth()->user()->username ?? auth()->user()->name }} 👋
+                    Hola, {{ auth()->user()->username ?? auth()->user()->name }}
                 </h1>
                 <p class="text-zinc-500 text-sm mt-1">¿Listo para la noche?</p>
             </div>

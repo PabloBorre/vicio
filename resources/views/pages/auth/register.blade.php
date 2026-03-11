@@ -1,32 +1,22 @@
-<x-layouts::auth :title="__('Crear cuenta')">
-    <div class="flex flex-col gap-5">
-        <x-auth-header :title="__('Crea tu cuenta')" :description="__('Completa todos los campos para registrarte')" />
+<x-layouts::auth>
+    <div class="flex flex-col gap-6">
+        <x-auth-header :title="__('Crear cuenta')" :description="__('Únete a VicioApp')" />
 
+        <!-- Session Status -->
         <x-auth-session-status class="text-center" :status="session('status')" />
 
-        {{-- Errores globales --}}
-        @if($errors->any())
-            <div class="bg-red-900/30 border border-red-800 rounded-xl px-4 py-3">
-                <p class="text-red-400 text-sm font-medium mb-1">Corrige los siguientes errores:</p>
-                <ul class="text-red-400 text-xs space-y-0.5 list-disc list-inside">
-                    @foreach($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
-
-        <form method="POST" action="{{ route('register.store') }}" enctype="multipart/form-data" class="flex flex-col gap-4">
+        <form method="POST" action="{{ route('register') }}" enctype="multipart/form-data" class="flex flex-col gap-5">
             @csrf
 
             {{-- ── FOTO DE PERFIL ── --}}
-            <div class="flex flex-col items-center gap-1">
+            <div class="flex flex-col items-center gap-2">
                 <label for="profile_photo" class="cursor-pointer group">
-                    <div class="size-24 rounded-full overflow-hidden bg-zinc-800 border-2 border-zinc-700 group-hover:border-vicio-400 transition-colors flex items-center justify-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="size-8 text-zinc-500" id="photo-placeholder" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <div class="size-24 rounded-full bg-zinc-800 border-2 border-zinc-700 group-hover:border-vicio-500 transition-colors overflow-hidden flex items-center justify-center relative"
+                         id="photo-placeholder">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="size-10 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                         </svg>
-                        <img id="photo-preview" src="" class="w-full h-full object-cover hidden" />
+                        <img id="photo-preview" src="" class="w-full h-full object-cover hidden absolute inset-0" />
                     </div>
                     <p class="text-vicio-400 text-xs text-center mt-1">Foto de perfil *</p>
                 </label>
@@ -43,7 +33,7 @@
                             reader.onload = e => {
                                 document.getElementById('photo-preview').src = e.target.result;
                                 document.getElementById('photo-preview').classList.remove('hidden');
-                                document.getElementById('photo-placeholder').classList.add('hidden');
+                                document.getElementById('photo-placeholder').querySelector('svg').classList.add('hidden');
                             };
                             reader.readAsDataURL(file);
                         }
@@ -63,27 +53,19 @@
                 required
                 autofocus
                 autocomplete="name"
-                placeholder="Tu nombre completo"
+                placeholder="Tu nombre"
             />
 
             {{-- ── USERNAME ── --}}
-            <div class="space-y-1.5">
-                <label class="block text-sm font-medium text-zinc-300">Nombre de usuario *</label>
-                <div class="relative">
-                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 text-sm z-10">@</span>
-                    <input
-                        type="text"
-                        name="username"
-                        value="{{ old('username') }}"
-                        required
-                        placeholder="tuusuario"
-                        class="w-full bg-zinc-800 dark:bg-zinc-800 border border-zinc-600 rounded-lg pl-7 pr-4 py-2.5 text-white placeholder-zinc-500 focus:outline-none focus:border-vicio-400 focus:ring-1 focus:ring-vicio-400 transition-colors text-sm"
-                    />
-                </div>
-                @error('username')
-                    <p class="text-red-400 text-xs">{{ $message }}</p>
-                @enderror
-            </div>
+            <flux:input
+                name="username"
+                :label="__('Nombre de usuario *')"
+                :value="old('username')"
+                type="text"
+                required
+                autocomplete="username"
+                placeholder="Solo letras, números y _"
+            />
 
             {{-- ── EMAIL ── --}}
             <flux:input
@@ -93,7 +75,7 @@
                 type="email"
                 required
                 autocomplete="email"
-                placeholder="email@ejemplo.com"
+                placeholder="tu@email.com"
             />
 
             {{-- ── CONTRASEÑA ── --}}
@@ -129,49 +111,92 @@
                 placeholder="Tu edad"
             />
 
-{{-- Género --}}
-<div class="space-y-2">
-    <label class="text-sm font-medium text-zinc-300">Me identifico como *</label>
-    <div class="grid grid-cols-2 gap-3">
-        @foreach(['man' => ['label' => 'Hombre', 'icon' => '👨'], 'woman' => ['label' => 'Mujer', 'icon' => '👩']] as $value => $opt)
-            <label class="cursor-pointer flex flex-col items-center gap-1.5 py-4 rounded-2xl text-sm font-semibold border-2 transition-all duration-200
-                bg-zinc-900 text-zinc-400 border-zinc-700
-                has-[:checked]:bg-vicio-600 has-[:checked]:text-white has-[:checked]:border-vicio-500
-                hover:border-zinc-500 hover:text-zinc-300">
-                <input type="button" name="gender_identity" value="{{ $value }}"
-                    {{ old('gender_identity') === $value ? 'checked' : '' }}
-                    class="hidden" required />
-                <span class="text-2xl">{{ $opt['icon'] }}</span>
-                <span>{{ $opt['label'] }}</span>
-            </label>
-        @endforeach
-    </div>
-    @error('gender_identity')
-        <p class="text-red-400 text-xs">{{ $message }}</p>
-    @enderror
-</div>
+            {{-- ── GÉNERO ── --}}
+            <div class="space-y-2">
+                <label class="text-sm font-medium text-zinc-300">Me identifico como *</label>
+                <div class="grid grid-cols-2 gap-3" id="gender-group">
+                    <button type="button"
+                        data-group="gender_identity" data-value="man"
+                        onclick="selectOption(this)"
+                        class="option-btn flex flex-col items-center gap-1.5 py-4 rounded-2xl text-sm font-semibold border-2 transition-all duration-200 bg-zinc-900 text-zinc-400 border-zinc-700 hover:border-zinc-500 hover:text-zinc-300">
+                        <span class="text-2xl">👨</span>
+                        <span>Hombre</span>
+                    </button>
+                    <button type="button"
+                        data-group="gender_identity" data-value="woman"
+                        onclick="selectOption(this)"
+                        class="option-btn flex flex-col items-center gap-1.5 py-4 rounded-2xl text-sm font-semibold border-2 transition-all duration-200 bg-zinc-900 text-zinc-400 border-zinc-700 hover:border-zinc-500 hover:text-zinc-300">
+                        <span class="text-2xl">👩</span>
+                        <span>Mujer</span>
+                    </button>
+                </div>
+                <input type="hidden" name="gender_identity" id="gender_identity" value="{{ old('gender_identity') }}" required />
+                @error('gender_identity')
+                    <p class="text-red-400 text-xs">{{ $message }}</p>
+                @enderror
+            </div>
 
-{{-- Preferencia --}}
-<div class="space-y-2">
-    <label class="text-sm font-medium text-zinc-300">Qué busco *</label>
-    <div class="grid grid-cols-3 gap-3">
-        @foreach(['man' => ['label' => 'Hombre', 'icon' => '👨'], 'woman' => ['label' => 'Mujer', 'icon' => '👩'], 'bi' => ['label' => 'Ambos', 'icon' => '💞']] as $value => $opt)
-            <label class="cursor-pointer flex flex-col items-center gap-1.5 py-4 rounded-2xl text-sm font-semibold border-2 transition-all duration-200
-                bg-zinc-900 text-zinc-400 border-zinc-700
-                has-[:checked]:bg-vicio-600 has-[:checked]:text-white has-[:checked]:border-vicio-500
-                hover:border-zinc-500 hover:text-zinc-300">
-                <input type="button" name="sexual_preference" value="{{ $value }}"
-                    {{ old('sexual_preference') === $value ? 'checked' : '' }}
-                    class="hidden" required />
-                <span class="text-2xl">{{ $opt['icon'] }}</span>
-                <span>{{ $opt['label'] }}</span>
-            </label>
-        @endforeach
-    </div>
-    @error('sexual_preference')
-        <p class="text-red-400 text-xs">{{ $message }}</p>
-    @enderror
-</div>
+            {{-- ── PREFERENCIA SEXUAL ── --}}
+            <div class="space-y-2">
+                <label class="text-sm font-medium text-zinc-300">Me gustan *</label>
+                <div class="grid grid-cols-3 gap-3" id="preference-group">
+                    <button type="button"
+                        data-group="sexual_preference" data-value="hetero"
+                        onclick="selectOption(this)"
+                        class="option-btn flex flex-col items-center gap-1.5 py-4 rounded-2xl text-sm font-semibold border-2 transition-all duration-200 bg-zinc-900 text-zinc-400 border-zinc-700 hover:border-zinc-500 hover:text-zinc-300">
+                        <span class="text-2xl">🔥</span>
+                        <span class="text-xs text-center leading-tight">El género opuesto</span>
+                    </button>
+                    <button type="button"
+                        data-group="sexual_preference" data-value="homo"
+                        onclick="selectOption(this)"
+                        class="option-btn flex flex-col items-center gap-1.5 py-4 rounded-2xl text-sm font-semibold border-2 transition-all duration-200 bg-zinc-900 text-zinc-400 border-zinc-700 hover:border-zinc-500 hover:text-zinc-300">
+                        <span class="text-2xl">✨</span>
+                        <span class="text-xs text-center leading-tight">Mi género</span>
+                    </button>
+                    <button type="button"
+                        data-group="sexual_preference" data-value="bi"
+                        onclick="selectOption(this)"
+                        class="option-btn flex flex-col items-center gap-1.5 py-4 rounded-2xl text-sm font-semibold border-2 transition-all duration-200 bg-zinc-900 text-zinc-400 border-zinc-700 hover:border-zinc-500 hover:text-zinc-300">
+                        <span class="text-2xl">💞</span>
+                        <span class="text-xs text-center leading-tight">Ambos</span>
+                    </button>
+                </div>
+                <input type="hidden" name="sexual_preference" id="sexual_preference" value="{{ old('sexual_preference') }}" required />
+                @error('sexual_preference')
+                    <p class="text-red-400 text-xs">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <script>
+                const ACTIVE = ['bg-vicio-600', 'text-white', 'border-vicio-500'];
+                const INACTIVE = ['bg-zinc-900', 'text-zinc-400', 'border-zinc-700'];
+
+                function selectOption(btn) {
+                    const group = btn.dataset.group;
+                    // Desmarcar todos los botones del mismo grupo
+                    document.querySelectorAll(`[data-group="${group}"]`).forEach(b => {
+                        b.classList.remove(...ACTIVE);
+                        b.classList.add(...INACTIVE);
+                    });
+                    // Marcar el clickado
+                    btn.classList.remove(...INACTIVE);
+                    btn.classList.add(...ACTIVE);
+                    // Guardar valor en el hidden input
+                    document.getElementById(group).value = btn.dataset.value;
+                }
+
+                // Restaurar selección si hay old() values (tras error de validación)
+                document.addEventListener('DOMContentLoaded', () => {
+                    ['gender_identity', 'sexual_preference'].forEach(group => {
+                        const val = document.getElementById(group).value;
+                        if (val) {
+                            const btn = document.querySelector(`[data-group="${group}"][data-value="${val}"]`);
+                            if (btn) selectOption(btn);
+                        }
+                    });
+                });
+            </script>
 
             {{-- ── BIO ── --}}
             <div class="space-y-1.5">

@@ -18,8 +18,8 @@ class CreateNewUser implements CreatesNewUsers
             'email'              => ['required', 'email', 'max:255', 'unique:users,email'],
             'password'           => ['required', 'confirmed', 'min:8'],
             'age'                => ['required', 'integer', 'min:18', 'max:99'],
-            'gender_identity'    => ['required', 'string', 'in:man,woman,non_binary,other'],
-            'sexual_preference'  => ['required', 'string', 'in:hetero,homo,bi,pan'],
+            'gender_identity'    => ['required', 'string', 'in:man,woman'],
+            'sexual_preference'  => ['required', 'string', 'in:hetero,homo,bi'],
             'bio'                => ['required', 'string', 'min:10', 'max:500'],
             'profile_photo'      => ['required', 'file', 'image', 'max:5120', 'mimes:jpg,jpeg,png,webp'],
         ], [

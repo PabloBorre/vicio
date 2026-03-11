@@ -37,3 +37,30 @@ Route::middleware(['auth'])->prefix('chats')->name('chats.')->group(function () 
     Route::get('{match}', [\App\Http\Controllers\Chat\ChatController::class, 'show'])
         ->name('show');
 });
+
+Route::middleware(['auth', \App\Http\Middleware\IsAdmin::class])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
+
+        Route::get('parties', [\App\Http\Controllers\Admin\AdminPartyController::class, 'index'])
+            ->name('parties.index');
+
+        Route::get('parties/create', [\App\Http\Controllers\Admin\AdminPartyController::class, 'create'])
+            ->name('parties.create');
+
+        Route::post('parties', [\App\Http\Controllers\Admin\AdminPartyController::class, 'store'])
+            ->name('parties.store');
+
+        Route::get('parties/{party}/edit', [\App\Http\Controllers\Admin\AdminPartyController::class, 'edit'])
+            ->name('parties.edit');
+
+        Route::put('parties/{party}', [\App\Http\Controllers\Admin\AdminPartyController::class, 'update'])
+            ->name('parties.update');
+
+        Route::patch('parties/{party}/status', [\App\Http\Controllers\Admin\AdminPartyController::class, 'updateStatus'])
+            ->name('parties.status');
+
+        Route::delete('parties/{party}', [\App\Http\Controllers\Admin\AdminPartyController::class, 'destroy'])
+            ->name('parties.destroy');
+    });

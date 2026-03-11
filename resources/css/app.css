@@ -11,42 +11,61 @@
 @theme {
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
 
-    --color-zinc-50: #fafafa;
-    --color-zinc-100: #f5f5f5;
-    --color-zinc-200: #e5e5e5;
-    --color-zinc-300: #d4d4d4;
-    --color-zinc-400: #a3a3a3;
-    --color-zinc-500: #737373;
-    --color-zinc-600: #525252;
-    --color-zinc-700: #404040;
-    --color-zinc-800: #262626;
-    --color-zinc-900: #171717;
-    --color-zinc-950: #0a0a0a;
-
     /* ── VicioApp Brand Colors ── */
     --color-vicio-50:  #f3eefa;
     --color-vicio-100: #e4d5f5;
     --color-vicio-200: #c9aaeb;
     --color-vicio-300: #ad80e0;
     --color-vicio-400: #8f55d4;
-    --color-vicio-500: #49197C;
-    --color-vicio-600: #3a146a;
-    --color-vicio-700: #2d0f4e;
-    --color-vicio-800: #1f0a37;
-    --color-vicio-900: #110520;
+    --color-vicio-500: #6B2BAF;
+    --color-vicio-600: #49197C;
+    --color-vicio-700: #3a146a;
+    --color-vicio-800: #2d0f4e;
+    --color-vicio-900: #1f0a37;
+    --color-vicio-950: #110520;
     --color-vicio:     #49197C;
 
-    /* ── Flux accent = VicioApp purple ── */
-    --color-accent:          #49197C;
-    --color-accent-content:  #49197C;
-    --color-accent-foreground: #ffffff;
+    /*
+     * BASE = LIGHT MODE (sin clase .dark)
+     * zinc-50 = fondo más claro, zinc-950 = más oscuro
+     */
+    --color-zinc-50:  #faf8ff;   /* fondo principal: blanco lavanda */
+    --color-zinc-100: #f0ebff;   /* superficies */
+    --color-zinc-200: #ddd0f7;   /* bordes suaves */
+    --color-zinc-300: #c4adee;   /* bordes medios */
+    --color-zinc-400: #a484de;   /* texto desactivado */
+    --color-zinc-500: #7c5ab8;   /* texto secundario */
+    --color-zinc-600: #5c3d99;   /* texto medio */
+    --color-zinc-700: #3d2270;   /* texto principal */
+    --color-zinc-800: #2a1550;   /* texto fuerte */
+    --color-zinc-900: #1a0c35;   /* texto muy fuerte */
+    --color-zinc-950: #0d0618;   /* negro morado */
+
+    /* Accent light: morado medio */
+    --color-accent:             #6B2BAF;
+    --color-accent-content:     #6B2BAF;
+    --color-accent-foreground:  #ffffff;
 }
 
+/* ── DARK MODE — morados muy oscuros ── */
 @layer theme {
     .dark {
-        --color-accent:           #8f55d4;
-        --color-accent-content:   #8f55d4;
-        --color-accent-foreground: #ffffff;
+        --color-zinc-50:  #0d0618;   /* fondo principal: negro morado */
+        --color-zinc-100: #150a25;
+        --color-zinc-200: #1f0e38;
+        --color-zinc-300: #2d1550;
+        --color-zinc-400: #4a2480;
+        --color-zinc-500: #6b3aaa;
+        --color-zinc-600: #9b6dd4;
+        --color-zinc-700: #c4a8ee;
+        --color-zinc-800: #ddd0f7;
+        --color-zinc-900: #f0ebff;
+        --color-zinc-950: #faf8ff;   /* texto más claro */
+
+        /* Accent dark: negro para botones */
+        --color-accent:             #0f0f0f;
+        --color-accent-content:     #0f0f0f;
+        --color-accent-foreground:  #ffffff;
     }
 }
 
@@ -56,7 +75,7 @@
     ::before,
     ::backdrop,
     ::file-selector-button {
-        border-color: var(--color-gray-200, currentColor);
+        border-color: var(--color-zinc-200, currentColor);
     }
 }
 
@@ -71,16 +90,19 @@
 input:focus[data-flux-control],
 textarea:focus[data-flux-control],
 select:focus[data-flux-control] {
-    @apply outline-hidden ring-2 ring-accent ring-offset-2 ring-offset-accent-foreground;
+    @apply outline-hidden ring-2 ring-accent ring-offset-2 ring-offset-zinc-50;
 }
 
 /* ── VicioApp utilidades globales ── */
+
+/* Dark: botones negros */
 .vicio-gradient {
-    background: linear-gradient(135deg, #49197C 0%, #6B2BAF 50%, #8f55d4 100%);
+    background: #0a0a0a;
 }
 
-.vicio-gradient-dark {
-    background: linear-gradient(135deg, #2d0f4e 0%, #49197C 100%);
+/* Light: botones morado degradado */
+html:not(.dark) .vicio-gradient {
+    background: linear-gradient(135deg, #49197C 0%, #6B2BAF 100%);
 }
 
 /* Swipe card shadow */

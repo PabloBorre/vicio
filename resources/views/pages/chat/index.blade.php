@@ -1,5 +1,5 @@
-<x-layouts.app.sidebar>
-    <flux:main class="!p-0">
+<x-layouts::app.sidebar>
+    <flux:main class="bg-zinc-950 !p-0">
         <livewire:chat.chat-list />
     </flux:main>
-</x-layouts.app.sidebar>
+</x-layouts::app.sidebar>

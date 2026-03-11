@@ -30,8 +30,6 @@ class AdminPartyController extends Controller
             'description'             => 'nullable|string|max:1000',
             'location'                => 'nullable|string|max:255',
             'starts_at'               => 'required|date',
-            'registration_opens_at'   => 'nullable|date|before:starts_at',
-            'registration_closes_at'  => 'nullable|date|before:starts_at',
             'cover_image'             => 'nullable|image|max:4096',
         ]);
 
@@ -60,8 +58,6 @@ class AdminPartyController extends Controller
             'description'             => 'nullable|string|max:1000',
             'location'                => 'nullable|string|max:255',
             'starts_at'               => 'required|date',
-            'registration_opens_at'   => 'nullable|date|before:starts_at',
-            'registration_closes_at'  => 'nullable|date|before:starts_at',
             'cover_image'             => 'nullable|image|max:4096',
         ]);
 

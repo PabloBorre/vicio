@@ -13,28 +13,24 @@ class PartyWaiting extends Component
 
     public function mount(Party $party): void
     {
-        $this->party = $party;
-        $this->secondsLeft = $party->secondsUntilStart();
+        $this->party       = $party;
+        $this->secondsLeft = max(0, (int) now()->diffInSeconds($party->starts_at, false));
         $this->attendees   = $party->users()->count();
     }
 
     public function checkPartyStatus(): void
     {
         $this->party->refresh();
-        $this->secondsLeft = $this->party->secondsUntilStart();
         $this->attendees   = $this->party->users()->count();
+        $this->secondsLeft = max(0, (int) now()->diffInSeconds($this->party->starts_at, false));
 
         if ($this->party->status === 'active') {
-            $this->redirectRoute('party.swipe', $this->party->qr_code);
+            $this->redirect(route('party.swipe', $this->party->qr_code));
         }
     }
 
     public function render()
     {
-        return view('livewire.party.party-waiting', [
-            'party'      => $this->party,
-            'secondsLeft' => $this->secondsLeft,
-            'attendees'  => $this->attendees,
-        ]);
+        return view('livewire.party.party-waiting');
     }
 }

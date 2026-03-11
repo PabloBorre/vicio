@@ -41,7 +41,7 @@
 {{-- Fechas --}}
 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
     <div class="space-y-1.5">
-        <label class="text-zinc-300 text-sm font-medium">Inicio del swipe *</label>
+        <label class="text-zinc-300 text-sm font-medium">Inicio del la fiesta *</label>
         <input
             type="datetime-local"
             name="starts_at"
@@ -49,17 +49,6 @@
             class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-vicio-400 focus:ring-1 focus:ring-vicio-400 transition-colors text-sm [color-scheme:dark]"
         />
         @error('starts_at') <p class="text-red-400 text-xs">{{ $message }}</p> @enderror
-    </div>
-
-    <div class="space-y-1.5">
-        <label class="text-zinc-300 text-sm font-medium">Apertura de registro</label>
-        <input
-            type="datetime-local"
-            name="registration_opens_at"
-            value="{{ old('registration_opens_at', isset($party) && $party->registration_opens_at ? $party->registration_opens_at->format('Y-m-d\TH:i') : '') }}"
-            class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-vicio-400 focus:ring-1 focus:ring-vicio-400 transition-colors text-sm [color-scheme:dark]"
-        />
-        @error('registration_opens_at') <p class="text-red-400 text-xs">{{ $message }}</p> @enderror
     </div>
 </div>
 

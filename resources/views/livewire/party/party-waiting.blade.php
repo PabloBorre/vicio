@@ -31,7 +31,7 @@
         <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-8 flex flex-col items-center gap-5">
 
             <div x-show="seconds > 0" class="flex flex-col items-center gap-4 w-full">
-                <p class="text-zinc-400 text-sm">El swipe empieza en</p>
+                <p class="text-zinc-400 text-sm">La fiesta empieza en</p>
                 <div class="flex items-center gap-1">
                     <div class="flex flex-col items-center">
                         <span x-text="String(h).padStart(2,'0')" class="font-mono text-4xl font-bold text-white tabular-nums"></span>
@@ -103,8 +103,17 @@
             </div>
         </div>
 
-        <p class="text-center text-zinc-600 text-xs pt-2">
-            Esta página se actualizará automáticamente cuando empiece el swipe
-        </p>
+        @if($party->status === 'active')
+    
+        <a href="{{ route('party.swipe', $party->qr_code) }}"
+        class="w-full vicio-gradient text-white font-semibold text-center py-4 rounded-2xl block hover:opacity-90 transition-opacity text-base"
+    >
+        🔥 ¡Entrar a la fiesta!
+    </a>
+@else
+    <p class="text-center text-zinc-600 text-xs pt-2">
+        Esta página se actualizará automáticamente cuando empiece la fiesta
+    </p>
+@endif
     </div>
 </div>

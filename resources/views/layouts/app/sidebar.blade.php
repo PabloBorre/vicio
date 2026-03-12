@@ -22,14 +22,7 @@
                 {{ __('Inicio') }}
             </flux:sidebar.item>
 
-            <flux:sidebar.item
-                icon="chat-bubble-left-right"
-                :href="route('chats.index')"
-                :current="request()->routeIs('chats.*')"
-                wire:navigate
-            >
-                {{ __('Chats') }}
-            </flux:sidebar.item>
+            <livewire:chat.unread-badge />
         </flux:sidebar.group>
 
         {{-- Mis fiestas --}}
@@ -112,6 +105,10 @@
 <flux:main class="bg-zinc-950 !p-0 overflow-y-auto h-dvh">
     {{ $slot }}
 </flux:main>
+
+@auth
+    <livewire:chat.chat-notification />
+@endauth
 
 @fluxScripts
 </body>

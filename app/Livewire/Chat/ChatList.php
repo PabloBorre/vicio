@@ -3,28 +3,29 @@
 namespace App\Livewire\Chat;
 
 use App\Models\PartyMatch;
+use Livewire\Attributes\On;
 use Livewire\Component;
 
 class ChatList extends Component
 {
+    public int $userId;
+
+    public function mount(): void
+    {
+        $this->userId = auth()->id();
+    }
+
     public function getMatchesProperty()
     {
-        $userId = auth()->id();
-
-        return PartyMatch::with([
-                'user1',
-                'user2',
-                'lastMessage',
-                'party',
-            ])
-            ->where(function ($q) use ($userId) {
-                $q->where('user1_id', $userId)
-                  ->orWhere('user2_id', $userId);
+        return PartyMatch::with(['user1', 'user2', 'lastMessage', 'party'])
+            ->where(function ($q) {
+                $q->where('user1_id', $this->userId)
+                  ->orWhere('user2_id', $this->userId);
             })
             ->get()
             ->sortByDesc(fn($m) => optional($m->lastMessage)->created_at)
-            ->map(function ($match) use ($userId) {
-                $other = $match->otherUser($userId);
+            ->map(function ($match) {
+                $other = $match->otherUser($this->userId);
                 return [
                     'match_id'          => $match->id,
                     'party_name'        => $match->party->name ?? '',
@@ -32,18 +33,16 @@ class ChatList extends Component
                     'profile_photo_url' => $other->profile_photo_url,
                     'last_message'      => optional($match->lastMessage)->body,
                     'last_message_time' => optional($match->lastMessage)->created_at?->diffForHumans(),
-                    'unread'            => $match->unreadCount($userId),
+                    'unread'            => $match->unreadCount($this->userId),
                 ];
             })
             ->values();
     }
 
-    // Escucha el canal personal de notificaciones del usuario autenticado
-    #[On('echo-private:user.{auth.id}.notifications,.new-message')]
+    #[On('echo-private:user.{userId}.notifications,.new-message')]
     public function onNewMessageNotification(): void
     {
-        // Forzar re-render para actualizar badges y último mensaje
-        $this->dispatch('$refresh');
+        // Re-render actualiza badges y último mensaje
     }
 
     public function render()

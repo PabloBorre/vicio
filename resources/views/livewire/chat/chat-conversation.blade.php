@@ -1,5 +1,6 @@
 <div
-    class="flex flex-col h-screen bg-zinc-950"
+    class="flex flex-col bg-zinc-950"
+    style="height: 100dvh;"
     x-data="{}"
     x-on:scroll-to-bottom.window="
         $nextTick(() => {
@@ -85,7 +86,8 @@
                         rows="1"
                         maxlength="1000"
                         placeholder="Escribe un mensaje..."
-                        class="w-full bg-transparent text-white placeholder-zinc-600 text-sm resize-none focus:outline-none leading-relaxed"
+                        class="w-full bg-transparent text-white placeholder-zinc-600 resize-none focus:outline-none leading-relaxed"
+                        style="font-size: 16px;"
                         x-data="{}"
                         x-on:keydown.enter.prevent="
                             if (!$event.shiftKey) {
@@ -104,7 +106,7 @@
                     class="size-11 rounded-full vicio-gradient flex items-center justify-center shrink-0 hover:opacity-90 active:scale-95 transition-all disabled:opacity-40"
                     wire:loading.attr="disabled"
                 >
-                    <svg xmlns="http://www.w3.org/2000/svg" class="size-5 text-white rotate-90" fill="currentColor" viewBox="0 0 24 24">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="size-5 text-white" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
                     </svg>
                 </button>

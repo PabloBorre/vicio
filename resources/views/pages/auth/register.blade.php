@@ -136,37 +136,37 @@
                 @enderror
             </div>
 
-            {{-- ── PREFERENCIA SEXUAL ── --}}
-            <div class="space-y-2">
-                <label class="text-sm font-medium text-zinc-300">Me gustan *</label>
-                <div class="grid grid-cols-3 gap-3" id="preference-group">
-                    <button type="button"
-                        data-group="sexual_preference" data-value="hetero"
-                        onclick="selectOption(this)"
-                        class="option-btn flex flex-col items-center gap-1.5 py-4 rounded-2xl text-sm font-semibold border-2 transition-all duration-200 bg-zinc-900 text-zinc-400 border-zinc-700 hover:border-zinc-500 hover:text-zinc-300">
-                        <span class="text-2xl">🔥</span>
-                        <span class="text-xs text-center leading-tight">El género opuesto</span>
-                    </button>
-                    <button type="button"
-                        data-group="sexual_preference" data-value="homo"
-                        onclick="selectOption(this)"
-                        class="option-btn flex flex-col items-center gap-1.5 py-4 rounded-2xl text-sm font-semibold border-2 transition-all duration-200 bg-zinc-900 text-zinc-400 border-zinc-700 hover:border-zinc-500 hover:text-zinc-300">
-                        <span class="text-2xl">✨</span>
-                        <span class="text-xs text-center leading-tight">Mi género</span>
-                    </button>
-                    <button type="button"
-                        data-group="sexual_preference" data-value="bi"
-                        onclick="selectOption(this)"
-                        class="option-btn flex flex-col items-center gap-1.5 py-4 rounded-2xl text-sm font-semibold border-2 transition-all duration-200 bg-zinc-900 text-zinc-400 border-zinc-700 hover:border-zinc-500 hover:text-zinc-300">
-                        <span class="text-2xl">💞</span>
-                        <span class="text-xs text-center leading-tight">Ambos</span>
-                    </button>
-                </div>
-                <input type="hidden" name="sexual_preference" id="sexual_preference" value="{{ old('sexual_preference') }}" required />
-                @error('sexual_preference')
-                    <p class="text-red-400 text-xs">{{ $message }}</p>
-                @enderror
-            </div>
+{{-- ── PREFERENCIA SEXUAL ── --}}
+<div class="space-y-2">
+    <label class="text-sm font-medium text-zinc-300">Me gustan *</label>
+    <div class="grid grid-cols-3 gap-3" id="preference-group">
+        <button type="button"
+            data-group="sexual_preference" data-value="hetero"
+            onclick="selectOption(this)"
+            class="option-btn flex flex-col items-center gap-1.5 py-4 rounded-2xl text-sm font-semibold border-2 transition-all duration-200 bg-zinc-900 text-zinc-400 border-zinc-700 hover:border-zinc-500 hover:text-zinc-300">
+            <span class="text-2xl">♂</span>
+            <span class="text-xs text-center leading-tight">Hombres</span>
+        </button>
+        <button type="button"
+            data-group="sexual_preference" data-value="homo"
+            onclick="selectOption(this)"
+            class="option-btn flex flex-col items-center gap-1.5 py-4 rounded-2xl text-sm font-semibold border-2 transition-all duration-200 bg-zinc-900 text-zinc-400 border-zinc-700 hover:border-zinc-500 hover:text-zinc-300">
+            <span class="text-2xl">♀</span>
+            <span class="text-xs text-center leading-tight">Mujeres</span>
+        </button>
+        <button type="button"
+            data-group="sexual_preference" data-value="bi"
+            onclick="selectOption(this)"
+            class="option-btn flex flex-col items-center gap-1.5 py-4 rounded-2xl text-sm font-semibold border-2 transition-all duration-200 bg-zinc-900 text-zinc-400 border-zinc-700 hover:border-zinc-500 hover:text-zinc-300">
+            <span class="text-2xl">⚥</span>
+            <span class="text-xs text-center leading-tight">Ambos</span>
+        </button>
+    </div>
+    <input type="hidden" name="sexual_preference" id="sexual_preference" value="{{ old('sexual_preference') }}" required />
+    @error('sexual_preference')
+        <p class="text-red-400 text-xs">{{ $message }}</p>
+    @enderror
+</div>
 
             <script>
                 const ACTIVE = ['bg-vicio-600', 'text-white', 'border-vicio-500'];

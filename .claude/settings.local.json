@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find /var/www/sitios/vicio/web -type f -name \"*migration*\" -o -name \"*push*\" -o -name \"*subscription*\" 2>/dev/null | grep -v vendor | head -30)"
+    ]
+  }
+}

@@ -5,6 +5,8 @@ namespace App\Livewire\Chat;
 use App\Events\NewMessage;
 use App\Models\Message;
 use App\Models\PartyMatch;
+use App\Notifications\NewMessagePush;
+use Carbon\Carbon;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
@@ -16,7 +18,6 @@ class ChatConversation extends Component
 
     public function mount(PartyMatch $match): void
     {
-        // Verificar que el usuario pertenece a este match
         abort_unless(
             $match->user1_id === auth()->id() || $match->user2_id === auth()->id(),
             403
@@ -30,7 +31,8 @@ class ChatConversation extends Component
     private function loadMessages(): void
     {
         $this->messages = Message::where('party_match_id', $this->match->id)
-            ->orderBy('created_at')
+            ->orderBy('created_at', 'asc')
+            ->orderBy('id', 'asc')
             ->get()
             ->map(fn($m) => [
                 'id'         => $m->id,
@@ -44,10 +46,14 @@ class ChatConversation extends Component
 
     private function markAsRead(): void
     {
-        Message::where('party_match_id', $this->match->id)
+        $updated = Message::where('party_match_id', $this->match->id)
             ->where('sender_id', '!=', auth()->id())
             ->whereNull('read_at')
             ->update(['read_at' => now()]);
+
+        if ($updated > 0) {
+            $this->dispatch('unread-count-changed');
+        }
     }
 
     public function sendMessage(): void
@@ -55,14 +61,11 @@ class ChatConversation extends Component
         $this->validate(['body' => 'required|string|max:1000']);
 
         $message = Message::create([
-            'party_match_id'  => $this->match->id,
-            'sender_id' => auth()->id(),
-            'body'      => $this->body,
+            'party_match_id' => $this->match->id,
+            'sender_id'      => auth()->id(),
+            'body'           => $this->body,
         ]);
 
-        
-
-        // Añadir a la lista local inmediatamente
         $this->messages[] = [
             'id'         => $message->id,
             'sender_id'  => $message->sender_id,
@@ -71,42 +74,40 @@ class ChatConversation extends Component
             'mine'       => true,
         ];
 
-        // Broadcast al otro usuario
         broadcast(new NewMessage($message));
+
+        // Push notification al destinatario
+        $recipient = $this->match->otherUser(auth()->id());
+        if ($recipient->pushSubscriptions()->exists()) {
+            $recipient->notify(new NewMessagePush($message, auth()->user()));
+        }
 
         $this->body = '';
         $this->dispatch('scroll-to-bottom');
     }
 
-    /**
-     * Recibe mensajes en tiempo real vía echo desde JS
-     */
     #[On('echo-private:chat.{match.id},.new-message')]
     public function onNewMessage(array $data): void
     {
-        // Ignorar si el mensaje es mío (ya lo añadí en sendMessage)
-        if ($data['sender_id'] === auth()->id()) return;
-
+        if ((int) $data['sender_id'] === auth()->id()) return;
+        
         $this->messages[] = [
             'id'         => $data['id'],
             'sender_id'  => $data['sender_id'],
             'body'       => $data['body'],
-            'created_at' => \Carbon\Carbon::parse($data['created_at'])->format('H:i'),
+            'created_at' => Carbon::parse($data['created_at'])->format('H:i'),
             'mine'       => false,
         ];
 
-        // Marcar como leído
         Message::where('id', $data['id'])->update(['read_at' => now()]);
-
+        $this->dispatch('unread-count-changed');
         $this->dispatch('scroll-to-bottom');
     }
 
     public function render()
     {
-        $other = $this->match->otherUser(auth()->id());
-
         return view('livewire.chat.chat-conversation', [
-            'other' => $other,
+            'other' => $this->match->otherUser(auth()->id()),
         ]);
     }
 }

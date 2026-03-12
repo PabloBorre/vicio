@@ -42,32 +42,29 @@ class PartyJoinController extends Controller
      * - Si está autenticado pero no es miembro → unirlo directamente
      */
     public function register(string $qr)
-    {
-        $party = Party::where('qr_code', $qr)->firstOrFail();
+{
+    $party = Party::where('qr_code', $qr)->firstOrFail();
 
-        if ($party->status === 'finished') {
-            abort(410, 'Esta fiesta ha finalizado.');
-        }
+    if ($party->status === 'finished') {
+        abort(410, 'Esta fiesta ha finalizado.');
+    }
 
-        if (auth()->check()) {
-            $isMember = auth()->user()->parties()->where('party_id', $party->id)->exists();
-            if ($isMember) {
-                return $this->redirectToPartyStage($party, $qr);
-            }
+    if (auth()->check()) {
+        $user = auth()->user();
 
-            // Ya tiene cuenta pero aún no está en la fiesta → unirlo directamente
-            $user = auth()->user();
+        if (! $user->parties()->where('party_id', $party->id)->exists()) {
             $user->update(['current_party_id' => $party->id]);
             $user->parties()->syncWithoutDetaching([
                 $party->id => ['joined_at' => now()]
             ]);
-
-            return $this->redirectToPartyStage($party, $qr);
         }
 
-        // No autenticado → mostrar formulario de creación de cuenta
-        return view('pages.party.register', compact('party'));
+        return $this->redirectToPartyStage($party, $qr);
     }
+
+    // Guarda la URL actual en sesión y manda al login
+    return redirect()->guest(route('party.register', $qr));
+}
 
     /**
      * Procesa el registro de cuenta nueva + unirse a la fiesta.

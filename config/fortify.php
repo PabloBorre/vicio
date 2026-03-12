@@ -73,7 +73,11 @@ return [
     |
     */
 
-    'home' => '/dashboard',
+    'home' => function () {
+    return session()->has('url.intended') 
+        ? session('url.intended') 
+        : '/dashboard';
+},  
 
     /*
     |--------------------------------------------------------------------------

@@ -25,11 +25,19 @@ class FortifyServiceProvider extends ServiceProvider
      * Bootstrap any application services.
      */
     public function boot(): void
-    {
-        $this->configureActions();
-        $this->configureViews();
-        $this->configureRateLimiting();
-    }
+{
+    $this->configureActions();
+    $this->configureViews();
+    $this->configureRateLimiting();
+
+    // Si hay un QR de fiesta pendiente en sesión, redirigir allí tras login
+    Fortify::redirects('login', function () {
+        if ($qr = session()->pull('intended_party_qr')) {
+            return route('party.register', $qr);
+        }
+        return config('fortify.home');
+    });
+}
 
     /**
      * Configure Fortify actions.

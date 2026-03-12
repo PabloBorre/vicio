@@ -40,6 +40,12 @@ Route::middleware(['auth'])->prefix('chats')->name('chats.')->group(function () 
         ->name('show');
 });
 
+// ── Push subscriptions ──
+Route::middleware(['auth'])->group(function () {
+    Route::post('push/subscribe', [\App\Http\Controllers\PushSubscriptionController::class, 'store']);
+    Route::post('push/unsubscribe', [\App\Http\Controllers\PushSubscriptionController::class, 'destroy']);
+});
+
 // ── Admin ──
 Route::middleware(['auth', \App\Http\Middleware\IsAdmin::class])
     ->prefix('admin')

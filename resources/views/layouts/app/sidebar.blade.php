@@ -25,40 +25,42 @@
             <livewire:chat.unread-badge />
         </flux:sidebar.group>
 
-        {{-- Mis fiestas --}}
+        {{-- Mis fiestas (solo usuarios no admin) --}}
         @auth
-            @php
-                $myParties = auth()->user()
-                    ->fresh()
-                    ->parties()
-                    ->whereIn('parties.status', ['draft','registration', 'countdown', 'active'])
-                    ->orderBy('starts_at')
-                    ->get();
-            @endphp
+            @if(!auth()->user()->is_admin)
+                @php
+                    $myParties = auth()->user()
+                        ->fresh()
+                        ->parties()
+                        ->whereIn('parties.status', ['draft','registration', 'countdown', 'active'])
+                        ->orderBy('starts_at')
+                        ->get();
+                @endphp
 
-            @if($myParties->isNotEmpty())
-                <flux:sidebar.group heading="Mis fiestas" class="grid">
-                    @foreach($myParties as $myParty)
-                        @php
-                            $partyRoute = $myParty->status === 'active'
-                                ? route('party.swipe', $myParty->qr_code)
-                                : route('party.waiting', $myParty->qr_code);
+                @if($myParties->isNotEmpty())
+                    <flux:sidebar.group heading="Mis fiestas" class="grid">
+                        @foreach($myParties as $myParty)
+                            @php
+                                $partyRoute = $myParty->status === 'active'
+                                    ? route('party.swipe', $myParty->qr_code)
+                                    : route('party.waiting', $myParty->qr_code);
 
-                            $badge = match($myParty->status) {
-                                'active'    => '🟢',
-                                'countdown' => '⏳',
-                                default     => '🎟️',
-                            };
-                        @endphp
-                        <flux:sidebar.item
-                            :href="$partyRoute"
-                            :current="request()->is('party/' . $myParty->qr_code . '*')"
-                            wire:navigate
-                        >
-                            {{ $badge }} {{ Str::limit($myParty->name, 20) }}
-                        </flux:sidebar.item>
-                    @endforeach
-                </flux:sidebar.group>
+                                $badge = match($myParty->status) {
+                                    'active'    => '🟢',
+                                    'countdown' => '⏳',
+                                    default     => '🎟️',
+                                };
+                            @endphp
+                            <flux:sidebar.item
+                                :href="$partyRoute"
+                                :current="request()->is('party/' . $myParty->qr_code . '*')"
+                                wire:navigate
+                            >
+                                {{ $badge }} {{ Str::limit($myParty->name, 20) }}
+                            </flux:sidebar.item>
+                        @endforeach
+                    </flux:sidebar.group>
+                @endif
             @endif
         @endauth
 
@@ -67,10 +69,18 @@
                 <flux:sidebar.item
                     icon="calendar-days"
                     href="/admin/parties"
-                    :current="request()->is('admin/*')"
+                    :current="request()->is('admin/parties*')"
                     wire:navigate
                 >
                     {{ __('Fiestas') }}
+                </flux:sidebar.item>
+                <flux:sidebar.item
+                    icon="users"
+                    href="/admin/users"
+                    :current="request()->is('admin/users*')"
+                    wire:navigate
+                >
+                    {{ __('Usuarios') }}
                 </flux:sidebar.item>
             </flux:sidebar.group>
         @endif

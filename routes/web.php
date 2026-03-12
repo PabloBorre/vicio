@@ -55,6 +55,7 @@ Route::middleware(['auth', \App\Http\Middleware\IsAdmin::class])
     ->name('admin.')
     ->group(function () {
 
+        // ── Parties ──
         Route::get('parties', [\App\Http\Controllers\Admin\AdminPartyController::class, 'index'])
             ->name('parties.index');
 
@@ -76,7 +77,25 @@ Route::middleware(['auth', \App\Http\Middleware\IsAdmin::class])
         Route::delete('parties/{party}', [\App\Http\Controllers\Admin\AdminPartyController::class, 'destroy'])
             ->name('parties.destroy');
 
-        // ── QR de una fiesta ──
         Route::get('parties/{party}/qr', [\App\Http\Controllers\Admin\AdminPartyController::class, 'qr'])
             ->name('parties.qr');
+
+        // ── Users ──
+        Route::get('users', [\App\Http\Controllers\Admin\AdminUserController::class, 'index'])
+            ->name('users.index');
+
+        Route::get('users/{user}/edit', [\App\Http\Controllers\Admin\AdminUserController::class, 'edit'])
+            ->name('users.edit');
+
+        Route::put('users/{user}', [\App\Http\Controllers\Admin\AdminUserController::class, 'update'])
+            ->name('users.update');
+
+        Route::delete('users/{user}', [\App\Http\Controllers\Admin\AdminUserController::class, 'destroy'])
+            ->name('users.destroy');
+
+        Route::patch('users/{user}/toggle-ban', [\App\Http\Controllers\Admin\AdminUserController::class, 'toggleBan'])
+            ->name('users.toggle-ban');
+
+        Route::patch('users/{user}/toggle-admin', [\App\Http\Controllers\Admin\AdminUserController::class, 'toggleAdmin'])
+            ->name('users.toggle-admin');
     });

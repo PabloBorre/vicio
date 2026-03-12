@@ -17,10 +17,10 @@
 >
 
 <div class="mb-6 w-full flex justify-start">
-    <a href="{{ route('admin.parties.index') }}"
+    <a href="{{ route('dashboard') }}"
         wire:navigate
         class="inline-flex items-center gap-2 text-zinc-400 hover:text-white text-sm font-medium transition-colors">
-        ← Volver al listado
+        ← Volver al inicio
     </a>
 </div>
     {{-- Logo --}}

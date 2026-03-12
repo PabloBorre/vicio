@@ -11,6 +11,16 @@ class AdminPartyController extends Controller
 {
     public function index()
     {
+        // Activar fiestas cuyo starts_at ya pasó (no depender del scheduler)
+        Party::where('status', 'registration')
+            ->where('starts_at', '<=', now())
+            ->update(['status' => 'active']);
+
+        // Finalizar fiestas activas que llevan más de 10 horas
+        Party::where('status', 'active')
+            ->where('starts_at', '<=', now()->subHours(10))
+            ->update(['status' => 'finished']);
+
         $parties = Party::withCount('users')
             ->orderByDesc('created_at')
             ->get();
@@ -26,11 +36,11 @@ class AdminPartyController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'name'                    => 'required|string|max:255',
-            'description'             => 'nullable|string|max:1000',
-            'location'                => 'nullable|string|max:255',
-            'starts_at'               => 'required|date',
-            'cover_image'             => 'nullable|image|max:4096',
+            'name'        => 'required|string|max:255',
+            'description' => 'nullable|string|max:1000',
+            'location'    => 'nullable|string|max:255',
+            'starts_at'   => 'required|date',
+            'cover_image' => 'nullable|image|max:4096',
         ]);
 
         if ($request->hasFile('cover_image')) {
@@ -54,15 +64,14 @@ class AdminPartyController extends Controller
     public function update(Request $request, Party $party)
     {
         $data = $request->validate([
-            'name'                    => 'required|string|max:255',
-            'description'             => 'nullable|string|max:1000',
-            'location'                => 'nullable|string|max:255',
-            'starts_at'               => 'required|date',
-            'cover_image'             => 'nullable|image|max:4096',
+            'name'        => 'required|string|max:255',
+            'description' => 'nullable|string|max:1000',
+            'location'    => 'nullable|string|max:255',
+            'starts_at'   => 'required|date',
+            'cover_image' => 'nullable|image|max:4096',
         ]);
 
         if ($request->hasFile('cover_image')) {
-            // Borrar imagen anterior si existe
             if ($party->cover_image) {
                 Storage::disk('public')->delete($party->cover_image);
             }
@@ -78,7 +87,8 @@ class AdminPartyController extends Controller
     public function updateStatus(Request $request, Party $party)
     {
         $request->validate([
-'status' => 'required|in:registration,active,finished',        ]);
+            'status' => 'required|in:registration,active,finished',
+        ]);
 
         $party->update(['status' => $request->status]);
 

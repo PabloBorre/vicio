@@ -38,6 +38,14 @@ class ChatList extends Component
             ->values();
     }
 
+    // Escucha el canal personal de notificaciones del usuario autenticado
+    #[On('echo-private:user.{auth.id}.notifications,.new-message')]
+    public function onNewMessageNotification(): void
+    {
+        // Forzar re-render para actualizar badges y último mensaje
+        $this->dispatch('$refresh');
+    }
+
     public function render()
     {
         return view('livewire.chat.chat-list', [

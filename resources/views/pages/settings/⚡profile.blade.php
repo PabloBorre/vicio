@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -10,24 +9,24 @@ use Livewire\WithFileUploads;
 new #[Title('Ajustes de perfil')] class extends Component {
     use WithFileUploads;
 
-    public string $name      = '';
-    public string $username  = '';
-    public string $email     = '';
-    public string $bio       = '';
-    public string $age       = '';
+    public string $name              = '';
+    public string $username          = '';
+    public string $email             = '';
+    public string $bio               = '';
+    public string|int $age           = '';
     public string $gender_identity   = '';
     public string $sexual_preference = '';
-    public $photo = null; // nuevo archivo subido
+    public $photo = null;
 
     public function mount(): void
     {
         $user = Auth::user();
-        $this->name             = $user->name     ?? '';
-        $this->username         = $user->username ?? '';
-        $this->email            = $user->email    ?? '';
-        $this->bio              = $user->bio       ?? '';
-        $this->age              = $user->age       ?? '';
-        $this->gender_identity  = $user->gender_identity   ?? '';
+        $this->name              = $user->name              ?? '';
+        $this->username          = $user->username          ?? '';
+        $this->email             = $user->email             ?? '';
+        $this->bio               = $user->bio               ?? '';
+        $this->age               = $user->age               ?? '';
+        $this->gender_identity   = $user->gender_identity   ?? '';
         $this->sexual_preference = $user->sexual_preference ?? '';
     }
 
@@ -36,20 +35,19 @@ new #[Title('Ajustes de perfil')] class extends Component {
         $user = Auth::user();
 
         $validated = $this->validate([
-            'name'             => ['required', 'string', 'max:255'],
-            'username'         => ['required', 'string', 'min:3', 'max:30', 'unique:users,username,' . $user->id, 'regex:/^[a-zA-Z0-9_]+$/'],
-            'email'            => ['required', 'email', 'max:255', 'unique:users,email,' . $user->id],
-            'bio'              => ['nullable', 'string', 'min:10', 'max:500'],
-            'age'              => ['required', 'integer', 'min:18', 'max:99'],
-            'gender_identity'  => ['required', 'in:man,woman,non_binary,other'],
-            'sexual_preference'=> ['required', 'in:hetero,homo,bi,pan'],
-            'photo'            => ['nullable', 'image', 'max:5120', 'mimes:jpg,jpeg,png,webp'],
+            'name'              => ['required', 'string', 'max:255'],
+            'username'          => ['required', 'string', 'min:3', 'max:30', 'unique:users,username,' . $user->id, 'regex:/^[a-zA-Z0-9_]+$/'],
+            'email'             => ['required', 'email', 'max:255', 'unique:users,email,' . $user->id],
+            'bio'               => ['nullable', 'string', 'max:500'],
+            'age'               => ['required', 'integer', 'min:18', 'max:99'],
+            'gender_identity'   => ['required', 'in:man,woman'],
+            'sexual_preference' => ['required', 'in:hetero,homo,bi'],
+            'photo'             => ['nullable', 'image', 'max:5120', 'mimes:jpg,jpeg,png,webp'],
         ], [
-            'username.unique'  => 'Este nombre de usuario ya está en uso.',
-            'username.regex'   => 'Solo letras, números y guiones bajos.',
-            'email.unique'     => 'Este email ya está registrado.',
-            'bio.min'          => 'La bio debe tener al menos 10 caracteres.',
-            'age.min'          => 'Debes tener al menos 18 años.',
+            'username.unique' => 'Este nombre de usuario ya está en uso.',
+            'username.regex'  => 'Solo letras, números y guiones bajos.',
+            'email.unique'    => 'Este email ya está registrado.',
+            'age.min'         => 'Debes tener al menos 18 años.',
         ]);
 
         if ($this->photo) {
@@ -57,10 +55,8 @@ new #[Title('Ajustes de perfil')] class extends Component {
                 Storage::disk('public')->delete($user->profile_photo_path);
             }
             $validated['profile_photo_path'] = $this->photo->store('profile-photos', 'public');
-            unset($validated['photo']);
-        } else {
-            unset($validated['photo']);
         }
+        unset($validated['photo']);
 
         if (isset($validated['email']) && $validated['email'] !== $user->email) {
             $user->email_verified_at = null;
@@ -79,11 +75,11 @@ new #[Title('Ajustes de perfil')] class extends Component {
 
     <x-pages::settings.layout
         :heading="__('Perfil')"
-        :subheading="__('Actualiza tu información personal')"
+        :subheading="__('Actualiza tu informacion personal')"
     >
         <form wire:submit="updateProfile" class="my-6 w-full space-y-5">
 
-            {{-- ── FOTO DE PERFIL ── --}}
+            {{-- FOTO --}}
             <div class="flex flex-col items-start gap-3">
                 <label class="text-sm font-medium text-zinc-300">Foto de perfil</label>
                 <div class="flex items-center gap-4">
@@ -102,86 +98,101 @@ new #[Title('Ajustes de perfil')] class extends Component {
                             Cambiar foto
                         </label>
                         <input id="photo-upload" type="file" wire:model="photo" accept="image/*" class="hidden" />
-                        <p class="text-zinc-600 text-xs mt-1.5">JPG, PNG o WebP · Máx 5 MB</p>
+                        <p class="text-zinc-600 text-xs mt-1.5">JPG, PNG o WebP. Max 5 MB</p>
                     </div>
                 </div>
                 @error('photo') <p class="text-red-400 text-xs">{{ $message }}</p> @enderror
             </div>
 
-            {{-- ── NOMBRE ── --}}
+            {{-- NOMBRE --}}
             <flux:input wire:model="name" label="Nombre completo" type="text" required autocomplete="name" />
 
-            {{-- ── USERNAME ── --}}
-            <flux:input wire:model="username" label="Nombre de usuario" type="text" required
-                        description="Solo letras, números y guiones bajos" />
+            {{-- USERNAME --}}
+            <flux:input wire:model="username" label="Nombre de usuario" type="text" required description="Solo letras, numeros y guiones bajos" />
 
-            {{-- ── EMAIL ── --}}
+            {{-- EMAIL --}}
             <flux:input wire:model="email" label="Email" type="email" required autocomplete="email" />
 
-            {{-- ── EDAD ── --}}
+            {{-- EDAD --}}
             <flux:input wire:model="age" label="Edad" type="number" min="18" max="99" required />
 
-            {{-- ── GÉNERO ── --}}
+            {{-- GENERO --}}
             <div class="space-y-2">
                 <label class="text-sm font-medium text-zinc-300">Me identifico como</label>
-                <div class="grid grid-cols-2 gap-3" id="settings-gender-group">
-                    @foreach(['man' => ['label'=>'Hombre','icon'=>'👨'], 'woman' => ['label'=>'Mujer','icon'=>'👩']] as $val => $opt)
-                        <button type="button"
-                            data-group="gender_identity" data-value="{{ $val }}"
-                            onclick="settingsSelect(this)"
-                            class="settings-option-btn flex flex-col items-center gap-1.5 py-3 rounded-2xl text-sm font-semibold border-2 transition-all duration-200 bg-zinc-900 text-zinc-400 border-zinc-700 hover:border-zinc-500">
-                            <span class="text-xl">{{ $opt['icon'] }}</span>
-                            <span>{{ $opt['label'] }}</span>
-                        </button>
-                    @endforeach
+                <div class="grid grid-cols-2 gap-3">
+                    <button type="button" wire:click="$set('gender_identity', 'man')"
+                        @class([
+                            'flex flex-col items-center gap-1.5 py-4 rounded-2xl text-sm font-semibold border-2 transition-all duration-200',
+                            'bg-vicio-600 text-white border-vicio-500' => $gender_identity === 'man',
+                            'bg-zinc-900 text-zinc-400 border-zinc-700 hover:border-zinc-500 hover:text-zinc-300' => $gender_identity !== 'man',
+                        ])>
+                        <span class="text-2xl">👨</span>
+                        <span>Hombre</span>
+                    </button>
+                    <button type="button" wire:click="$set('gender_identity', 'woman')"
+                        @class([
+                            'flex flex-col items-center gap-1.5 py-4 rounded-2xl text-sm font-semibold border-2 transition-all duration-200',
+                            'bg-vicio-600 text-white border-vicio-500' => $gender_identity === 'woman',
+                            'bg-zinc-900 text-zinc-400 border-zinc-700 hover:border-zinc-500 hover:text-zinc-300' => $gender_identity !== 'woman',
+                        ])>
+                        <span class="text-2xl">👩</span>
+                        <span>Mujer</span>
+                    </button>
                 </div>
-                <input type="hidden" id="settings_gender_identity" wire:model="gender_identity" />
                 @error('gender_identity') <p class="text-red-400 text-xs">{{ $message }}</p> @enderror
             </div>
 
-            {{-- ── PREFERENCIA SEXUAL ── --}}
+            {{-- PREFERENCIA --}}
             <div class="space-y-2">
                 <label class="text-sm font-medium text-zinc-300">Me gustan</label>
-                <div class="grid grid-cols-3 gap-3" id="settings-preference-group">
-                    <button type="button" data-group="sexual_preference" data-value="hetero"
-                        onclick="settingsSelect(this)"
-                        class="settings-option-btn flex flex-col items-center gap-1.5 py-3 rounded-2xl text-sm font-semibold border-2 transition-all duration-200 bg-zinc-900 text-zinc-400 border-zinc-700 hover:border-zinc-500">
-                        <span class="text-xl">🔥</span>
-                        <span class="text-center leading-tight text-xs">El género opuesto</span>
+                <div class="grid grid-cols-3 gap-3">
+                    <button type="button" wire:click="$set('sexual_preference', 'hetero')"
+                        @class([
+                            'flex flex-col items-center gap-1.5 py-4 rounded-2xl text-sm font-semibold border-2 transition-all duration-200',
+                            'bg-vicio-600 text-white border-vicio-500' => $sexual_preference === 'hetero',
+                            'bg-zinc-900 text-zinc-400 border-zinc-700 hover:border-zinc-500 hover:text-zinc-300' => $sexual_preference !== 'hetero',
+                        ])>
+                        <span class="text-2xl">🔥</span>
+                        <span class="text-xs text-center leading-tight">El genero opuesto</span>
                     </button>
-                    <button type="button" data-group="sexual_preference" data-value="homo"
-                        onclick="settingsSelect(this)"
-                        class="settings-option-btn flex flex-col items-center gap-1.5 py-3 rounded-2xl text-sm font-semibold border-2 transition-all duration-200 bg-zinc-900 text-zinc-400 border-zinc-700 hover:border-zinc-500">
-                        <span class="text-xl">✨</span>
-                        <span class="text-center leading-tight text-xs">Mi género</span>
+                    <button type="button" wire:click="$set('sexual_preference', 'homo')"
+                        @class([
+                            'flex flex-col items-center gap-1.5 py-4 rounded-2xl text-sm font-semibold border-2 transition-all duration-200',
+                            'bg-vicio-600 text-white border-vicio-500' => $sexual_preference === 'homo',
+                            'bg-zinc-900 text-zinc-400 border-zinc-700 hover:border-zinc-500 hover:text-zinc-300' => $sexual_preference !== 'homo',
+                        ])>
+                        <span class="text-2xl">✨</span>
+                        <span class="text-xs text-center leading-tight">Mi genero</span>
                     </button>
-                    <button type="button" data-group="sexual_preference" data-value="bi"
-                        onclick="settingsSelect(this)"
-                        class="settings-option-btn flex flex-col items-center gap-1.5 py-3 rounded-2xl text-sm font-semibold border-2 transition-all duration-200 bg-zinc-900 text-zinc-400 border-zinc-700 hover:border-zinc-500">
-                        <span class="text-xl">💞</span>
-                        <span class="text-center leading-tight text-xs">Ambos</span>
+                    <button type="button" wire:click="$set('sexual_preference', 'bi')"
+                        @class([
+                            'flex flex-col items-center gap-1.5 py-4 rounded-2xl text-sm font-semibold border-2 transition-all duration-200',
+                            'bg-vicio-600 text-white border-vicio-500' => $sexual_preference === 'bi',
+                            'bg-zinc-900 text-zinc-400 border-zinc-700 hover:border-zinc-500 hover:text-zinc-300' => $sexual_preference !== 'bi',
+                        ])>
+                        <span class="text-2xl">💞</span>
+                        <span class="text-xs text-center leading-tight">Ambos</span>
                     </button>
                 </div>
-                <input type="hidden" id="settings_sexual_preference" wire:model="sexual_preference" />
                 @error('sexual_preference') <p class="text-red-400 text-xs">{{ $message }}</p> @enderror
             </div>
 
-            {{-- ── BIO ── --}}
+            {{-- BIO --}}
             <div class="space-y-1.5">
-                <label class="text-sm font-medium text-zinc-300">Sobre ti <span class="text-zinc-500 text-xs font-normal">(mín. 10 caracteres)</span></label>
+                <label class="text-sm font-medium text-zinc-300">Sobre ti <span class="text-zinc-500 text-xs font-normal">(max. 500 caracteres)</span></label>
                 <textarea wire:model="bio" rows="3" maxlength="500"
                     class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-3 text-white placeholder-zinc-600 focus:outline-none focus:border-vicio-400 focus:ring-1 focus:ring-vicio-400 transition-colors resize-none text-sm"
-                    placeholder="Cuéntanos algo de ti..."></textarea>
+                    placeholder="Cuentanos algo de ti..."></textarea>
                 @error('bio') <p class="text-red-400 text-xs">{{ $message }}</p> @enderror
             </div>
 
-            {{-- ── SUBMIT ── --}}
+            {{-- SUBMIT --}}
             <div class="flex items-center gap-4 pt-1">
                 <flux:button variant="primary" type="submit">
                     {{ __('Guardar cambios') }}
                 </flux:button>
                 <x-action-message on="profile-updated">
-                    ✓ {{ __('Guardado') }}
+                    Guardado
                 </x-action-message>
             </div>
         </form>
@@ -189,41 +200,3 @@ new #[Title('Ajustes de perfil')] class extends Component {
         <livewire:pages::settings.delete-user-form />
     </x-pages::settings.layout>
 </section>
-
-<script>
-    const ACTIVE_CLS   = ['bg-vicio-600', 'text-white', 'border-vicio-500'];
-    const INACTIVE_CLS = ['bg-zinc-900', 'text-zinc-400', 'border-zinc-700'];
-
-    function settingsSelect(btn) {
-        const group = btn.dataset.group;
-        document.querySelectorAll(`[data-group="${group}"]`).forEach(b => {
-            b.classList.remove(...ACTIVE_CLS);
-            b.classList.add(...INACTIVE_CLS);
-        });
-        btn.classList.remove(...INACTIVE_CLS);
-        btn.classList.add(...ACTIVE_CLS);
-
-        // Actualizar el hidden input y notificar a Livewire
-        const fieldMap = { gender_identity: 'settings_gender_identity', sexual_preference: 'settings_sexual_preference' };
-        const input = document.getElementById(fieldMap[group]);
-        if (input) {
-            input.value = btn.dataset.value;
-            input.dispatchEvent(new Event('input'));
-        }
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-        // Marcar los botones según los valores actuales de Livewire
-        const gender = document.getElementById('settings_gender_identity')?.value;
-        const pref   = document.getElementById('settings_sexual_preference')?.value;
-
-        if (gender) {
-            const btn = document.querySelector(`[data-group="gender_identity"][data-value="${gender}"]`);
-            if (btn) settingsSelect(btn);
-        }
-        if (pref) {
-            const btn = document.querySelector(`[data-group="sexual_preference"][data-value="${pref}"]`);
-            if (btn) settingsSelect(btn);
-        }
-    });
-</script>

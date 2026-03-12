@@ -29,7 +29,7 @@ class ChatConversation extends Component
 
     private function loadMessages(): void
     {
-        $this->messages = Message::where('party_party_match_id', $this->match->id)
+        $this->messages = Message::where('party_match_id', $this->match->id)
             ->orderBy('created_at')
             ->get()
             ->map(fn($m) => [
@@ -44,7 +44,7 @@ class ChatConversation extends Component
 
     private function markAsRead(): void
     {
-        Message::where('party_party_match_id', $this->match->id)
+        Message::where('party_match_id', $this->match->id)
             ->where('sender_id', '!=', auth()->id())
             ->whereNull('read_at')
             ->update(['read_at' => now()]);
@@ -55,17 +55,19 @@ class ChatConversation extends Component
         $this->validate(['body' => 'required|string|max:1000']);
 
         $message = Message::create([
-            'party_party_match_id'  => $this->match->id,
+            'party_match_id'  => $this->match->id,
             'sender_id' => auth()->id(),
             'body'      => $this->body,
         ]);
+
+        
 
         // Añadir a la lista local inmediatamente
         $this->messages[] = [
             'id'         => $message->id,
             'sender_id'  => $message->sender_id,
             'body'       => $message->body,
-            'created_at' => $message->created_at->format('H:i'),
+            'created_at' => ($message->created_at ?? now())->format('H:i'),
             'mine'       => true,
         ];
 

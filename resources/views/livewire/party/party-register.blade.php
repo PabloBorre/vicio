@@ -78,14 +78,7 @@
         {{-- ── NOMBRE COMPLETO ── --}}
         <div class="space-y-1.5">
             <label class="text-sm font-medium text-zinc-300">Nombre completo <span class="text-red-400">*</span></label>
-            <input
-                type="text"
-                name="name"
-                value="{{ old('name') }}"
-                required
-                placeholder="Tu nombre"
-                class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-3 text-white placeholder-zinc-600 focus:outline-none focus:border-vicio-400 focus:ring-1 focus:ring-vicio-400 transition-colors text-sm @error('name') border-red-500 @enderror"
-            />
+            <input type="text" name="name" value="{{ old('name') }}" required placeholder="Tu nombre" class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-3 text-white placeholder-zinc-600 focus:outline-none focus:border-vicio-400 focus:ring-1 focus:ring-vicio-400 transition-colors text-sm @error('name') border-red-500 @enderror"/>
             @error('name')<p class="text-red-400 text-xs">{{ $message }}</p>@enderror
         </div>
 
@@ -94,10 +87,7 @@
             <label class="text-sm font-medium text-zinc-300">Nombre de usuario <span class="text-red-400">*</span></label>
             <div class="relative">
                 <span class="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 text-sm">@</span>
-                <input
-                    type="text"
-                    name="username"
-                    value="{{ old('username') }}"
+                <input type="text" name="username" value="{{ old('username') }}"
                     required
                     placeholder="tuusuario"
                     class="w-full bg-zinc-900 border border-zinc-700 rounded-xl pl-7 pr-4 py-3 text-white placeholder-zinc-600 focus:outline-none focus:border-vicio-400 focus:ring-1 focus:ring-vicio-400 transition-colors text-sm @error('username') border-red-500 @enderror"
@@ -213,12 +203,7 @@
         </div>
 
         {{-- ── SUBMIT ── --}}
-        <button
-            type="submit"
-            class="w-full vicio-gradient text-white font-bold py-4 rounded-2xl hover:opacity-90 transition-opacity text-base mt-2"
-        >
-            🎉 ¡Crear cuenta y entrar!
-        </button>
+        <button type="submit" class="w-full vicio-gradient text-white font-bold py-4 rounded-2xl hover:opacity-90 transition-opacity text-base mt-2">¡Crear cuenta y entrar!</button>
 
         <p class="text-center text-xs text-zinc-600">
             ¿Ya tienes cuenta?

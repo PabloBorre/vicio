@@ -3,7 +3,7 @@
 <head>
     @include('partials.head')
 </head>
-<body class="h-dvh overflow-hidden bg-zinc-950">
+<body class="h-dvh bg-zinc-950 overflow-hidden">
 
 <flux:sidebar sticky stashable class="border-e border-zinc-800 bg-zinc-950">
 
@@ -54,7 +54,6 @@
                             $badge = match($myParty->status) {
                                 'active'    => '🟢',
                                 'countdown' => '⏳',
-                                'draft'     => '🎟️',
                                 default     => '🎟️',
                             };
                         @endphp
@@ -110,7 +109,7 @@
     <div class="size-8"></div>
 </flux:header>
 
-<flux:main class="bg-zinc-950 !p-0">
+<flux:main class="bg-zinc-950 !p-0 overflow-y-auto h-dvh">
     {{ $slot }}
 </flux:main>
 

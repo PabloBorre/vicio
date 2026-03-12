@@ -19,6 +19,14 @@ class Message extends Model
         ];
     }
     
+    protected static function booted(): void
+    {
+        // Rellenamos created_at manualmente al crear
+        static::creating(function (Message $message) {
+            $message->created_at = now();
+        });
+    }
+
 public function match()
 {
     return $this->belongsTo(PartyMatch::class, 'party_match_id');

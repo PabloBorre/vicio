@@ -12,24 +12,25 @@ use Livewire\Component;
 class SwipeEngine extends Component
 {
     public Party $party;
-    public ?array $currentCard = null;
-    public ?array $nextCard = null;
-    public bool $noMoreCards = false;
-    public ?array $lastMatch = null;
+    public ?array $currentCard  = null;
+    public ?array $nextCard     = null;
+    public bool   $noMoreCards  = false;
+    public ?array $lastMatch    = null;
 
-    private Collection $queue;
+    /** IDs pendientes — público para que Livewire lo serialice entre requests */
+    public array $pendingIds = [];
 
     public function mount(Party $party): void
     {
         $this->party = $party;
-        $this->loadQueue();
+        $this->loadPendingIds();
         $this->advanceQueue();
     }
 
     /**
-     * Carga la cola de usuarios filtrando por preferencia sexual.
+     * Carga los IDs de la cola filtrando por preferencia.
      */
-    private function loadQueue(): void
+    private function loadPendingIds(): void
     {
         $me = auth()->user();
 
@@ -44,52 +45,41 @@ class SwipeEngine extends Component
 
         $query = $this->applyPreferenceFilter($query, $me);
 
-        $this->queue = $query->inRandomOrder()->get(['id', 'username', 'name', 'age', 'bio', 'profile_photo_path', 'gender_identity']);
+        $this->pendingIds = $query->inRandomOrder()->pluck('id')->toArray();
     }
 
     /**
-     * Aplica filtros de preferencia sexual con lógica de compatibilidad mutua.
-     *
-     * Lógica:
-     *  - hetero (hombre): ve mujeres con hetero o bi
-     *  - hetero (mujer):  ve hombres con hetero o bi
-     *  - homo   (hombre): ve hombres con homo o bi
-     *  - homo   (mujer):  ve mujeres con homo o bi
-     *  - bi     (hombre): ve hombres con homo/bi + mujeres con hetero/bi
-     *  - bi     (mujer):  ve mujeres con homo/bi + hombres con hetero/bi
+     * Devuelve la cola como Collection a partir de $pendingIds.
      */
+    private function getQueue(): Collection
+    {
+        if (empty($this->pendingIds)) {
+            return collect();
+        }
+
+        return User::whereIn('id', $this->pendingIds)
+            ->orderByRaw('FIELD(id, ' . implode(',', $this->pendingIds) . ')')
+            ->get(['id', 'username', 'name', 'age', 'bio', 'profile_photo_path', 'gender_identity']);
+    }
+
     private function applyPreferenceFilter($query, User $me)
     {
         $myPref   = $me->sexual_preference ?? 'bi';
         $myGender = $me->gender_identity   ?? 'man';
-
-        // Género opuesto
         $opposite = $myGender === 'man' ? 'woman' : 'man';
 
         return $query->where(function ($q) use ($myPref, $myGender, $opposite) {
-
             if ($myPref === 'hetero') {
-                // Me interesan el género opuesto que también se interese en mí
-                // Ellos deben ser del género opuesto Y tener hetero o bi
                 $q->where('gender_identity', $opposite)
                   ->whereIn('sexual_preference', ['hetero', 'bi']);
-
             } elseif ($myPref === 'homo') {
-                // Me interesa mi mismo género que también se interese en mí
-                // Ellos deben ser de mi género Y tener homo o bi
                 $q->where('gender_identity', $myGender)
                   ->whereIn('sexual_preference', ['homo', 'bi']);
-
             } elseif ($myPref === 'bi') {
-                // Me interesan ambos géneros
-                // Hombres que les gustan personas de mi género
-                // + Mujeres que les gustan personas de mi género
-                $q->where(function ($sub) use ($myGender, $opposite) {
-                    // Mi mismo género con homo o bi
+                $q->where(function ($sub) use ($myGender) {
                     $sub->where('gender_identity', $myGender)
                         ->whereIn('sexual_preference', ['homo', 'bi']);
-                })->orWhere(function ($sub) use ($myGender, $opposite) {
-                    // Género opuesto con hetero o bi
+                })->orWhere(function ($sub) use ($opposite) {
                     $sub->where('gender_identity', $opposite)
                         ->whereIn('sexual_preference', ['hetero', 'bi']);
                 });
@@ -98,31 +88,36 @@ class SwipeEngine extends Component
     }
 
     /**
-     * Avanza la cola: current ← next ← queue.shift()
+     * Avanza la cola: current ← next ← pendingIds.shift()
      */
     private function advanceQueue(): void
     {
         $this->currentCard = $this->nextCard;
-        $next = $this->queue->shift();
 
-        if ($next) {
-            $this->nextCard = $this->userToCard($next);
+        $nextId = array_shift($this->pendingIds);
+
+        if ($nextId) {
+            $user = User::find($nextId, ['id', 'username', 'name', 'age', 'bio', 'profile_photo_path', 'gender_identity']);
+            $this->nextCard = $user ? $this->userToCard($user) : null;
         } else {
             $this->nextCard = null;
         }
 
+        // Primera carga: currentCard estaba null, promover nextCard
         if ($this->currentCard === null && $this->nextCard !== null) {
             $this->currentCard = $this->nextCard;
-            $next2 = $this->queue->shift();
-            $this->nextCard = $next2 ? $this->userToCard($next2) : null;
+            $nextId2 = array_shift($this->pendingIds);
+            if ($nextId2) {
+                $user2 = User::find($nextId2, ['id', 'username', 'name', 'age', 'bio', 'profile_photo_path', 'gender_identity']);
+                $this->nextCard = $user2 ? $this->userToCard($user2) : null;
+            } else {
+                $this->nextCard = null;
+            }
         }
 
         $this->noMoreCards = ($this->currentCard === null);
     }
 
-    /**
-     * Convierte un modelo User en array para la tarjeta.
-     */
     private function userToCard(User $user): array
     {
         return [
@@ -135,9 +130,6 @@ class SwipeEngine extends Component
         ];
     }
 
-    /**
-     * Registra un swipe y comprueba si hay match.
-     */
     public function swipe(string $direction): void
     {
         if (!$this->currentCard) return;
@@ -159,7 +151,9 @@ class SwipeEngine extends Component
                 ->exists();
 
             if ($mutualLike) {
-                [$u1, $u2] = $me->id < $swipedId ? [$me->id, $swipedId] : [$swipedId, $me->id];
+                [$u1, $u2] = $me->id < $swipedId
+                    ? [$me->id, $swipedId]
+                    : [$swipedId, $me->id];
 
                 PartyMatch::firstOrCreate([
                     'user1_id' => $u1,
@@ -178,12 +172,9 @@ class SwipeEngine extends Component
         $this->advanceQueue();
     }
 
-    /**
-     * Recarga la cola (botón "Actualizar" cuando no hay más perfiles).
-     */
     public function reload(): void
     {
-        $this->loadQueue();
+        $this->loadPendingIds();
         $this->currentCard = null;
         $this->nextCard    = null;
         $this->advanceQueue();
@@ -198,4 +189,4 @@ class SwipeEngine extends Component
     {
         return view('livewire.party.swipe-engine');
     }
-}
+}   

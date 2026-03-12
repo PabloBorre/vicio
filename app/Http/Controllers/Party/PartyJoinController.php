@@ -51,9 +51,12 @@ class PartyJoinController extends Controller
 
     // No autenticado → guardar QR en sesión y mandar al login
     if (! auth()->check()) {
-        session(['intended_party_qr' => $qr]);
-        return redirect()->route('login');
-    }
+    session([
+        'intended_party_qr' => $qr,
+        'url.intended'      => route('party.register', $qr),
+    ]);
+    return redirect()->route('login');
+}
 
     $user = auth()->user();
     $isMember = $user->parties()->where('party_id', $party->id)->exists();

@@ -1,4 +1,4 @@
-<meta charset="utf-8" />
+<meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content" />
 <meta name="csrf-token" content="{{ csrf_token() }}" />
 <meta name="vapid-key" content="{{ config('webpush.vapid.public_key') }}" />
@@ -18,4 +18,7 @@
 <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600,700" rel="stylesheet" />
 
 @vite(['resources/css/app.css', 'resources/js/app.js'])
-@fluxAppearance
+<script>
+    document.documentElement.classList.add('dark');
+    localStorage.setItem('flux_appearance', 'dark');
+</script>   

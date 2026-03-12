@@ -108,6 +108,7 @@
 
 @auth
     <livewire:chat.chat-notification />
+    @include('partials.push-prompt')
 @endauth
 
 @fluxScripts

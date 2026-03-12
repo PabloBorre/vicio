@@ -15,6 +15,14 @@
     x-init="tick()"
     wire:poll.10s="checkPartyStatus"
 >
+
+<div class="mb-6 w-full flex justify-start">
+    <a href="{{ route('admin.parties.index') }}"
+        wire:navigate
+        class="inline-flex items-center gap-2 text-zinc-400 hover:text-white text-sm font-medium transition-colors">
+        ← Volver al listado
+    </a>
+</div>
     {{-- Logo --}}
     <div class="flex flex-col items-center gap-2 mb-10">
         <div class="size-14 rounded-full vicio-gradient flex items-center justify-center shadow-lg">

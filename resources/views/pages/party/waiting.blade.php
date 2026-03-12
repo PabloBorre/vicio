@@ -7,6 +7,11 @@
 
     <livewire:party.party-waiting :party="$party" />
 
+    @auth
+        <livewire:chat.chat-notification />
+        @include('partials.push-prompt')
+    @endauth
+
     @fluxScripts
 </body>
 </html>

@@ -29,6 +29,9 @@ Route::prefix('party')->name('party.')->group(function () {
     Route::get('{qr}/swipe', [\App\Http\Controllers\Party\PartyJoinController::class, 'swipe'])
         ->middleware('auth')
         ->name('swipe');
+        
+    Route::post('{qr}/login', [\App\Http\Controllers\Party\PartyJoinController::class, 'login'])
+    ->name('login');
 });
 
 require __DIR__.'/settings.php';

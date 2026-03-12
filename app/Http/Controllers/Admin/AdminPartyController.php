@@ -12,7 +12,7 @@ class AdminPartyController extends Controller
     public function index()
     {
         // Activar fiestas cuyo starts_at ya pasó (no depender del scheduler)
-        Party::where('status', 'registration')
+        Party::whereIn('status', ['registration', 'countdown'])
             ->where('starts_at', '<=', now())
             ->update(['status' => 'active']);
 

@@ -49,21 +49,26 @@ class PartyJoinController extends Controller
         abort(410, 'Esta fiesta ha finalizado.');
     }
 
-    if (auth()->check()) {
-        $user = auth()->user();
+    // No autenticado → guardar QR en sesión y mandar al login
+    if (! auth()->check()) {
+        session(['intended_party_qr' => $qr]);
+        return redirect()->route('login');
+    }
 
-        if (! $user->parties()->where('party_id', $party->id)->exists()) {
-            $user->update(['current_party_id' => $party->id]);
-            $user->parties()->syncWithoutDetaching([
-                $party->id => ['joined_at' => now()]
-            ]);
-        }
+    $user = auth()->user();
+    $isMember = $user->parties()->where('party_id', $party->id)->exists();
 
+    if ($isMember) {
         return $this->redirectToPartyStage($party, $qr);
     }
 
-    // Guarda la URL actual en sesión y manda al login
-    return redirect()->guest(route('party.register', $qr));
+    // Autenticado pero no miembro → unirlo y redirigir
+    $user->update(['current_party_id' => $party->id]);
+    $user->parties()->syncWithoutDetaching([
+        $party->id => ['joined_at' => now()]
+    ]);
+
+    return $this->redirectToPartyStage($party, $qr);
 }
 
     /**

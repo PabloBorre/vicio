@@ -14,8 +14,8 @@ class UpdatePartyStatuses extends Command
     {
         $now = now();
 
-        // registration → active: cuando llega starts_at
-        $activated = Party::where('status', 'registration')
+        // registration/countdown → active: cuando llega starts_at
+        $activated = Party::whereIn('status', ['registration', 'countdown'])
             ->where('starts_at', '<=', $now)
             ->update(['status' => 'active']);
 

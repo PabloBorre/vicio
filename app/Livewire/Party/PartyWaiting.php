@@ -24,9 +24,9 @@ class PartyWaiting extends Component
         $this->attendees   = $this->party->users()->count();
         $this->secondsLeft = max(0, (int) now()->diffInSeconds($this->party->starts_at, false));
 
-        // Si starts_at ya pasó y la fiesta sigue en registration, activarla aquí mismo
+        // Si starts_at ya pasó y la fiesta sigue en registration/countdown, activarla aquí mismo
         if (
-            $this->party->status === 'registration'
+            in_array($this->party->status, ['registration', 'countdown'])
             && now()->gte($this->party->starts_at)
         ) {
             $this->party->update(['status' => 'active']);

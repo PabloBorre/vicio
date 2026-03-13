@@ -4,11 +4,14 @@ namespace App\Providers;
 
 use App\Actions\Fortify\CreateNewUser;
 use App\Actions\Fortify\ResetUserPassword;
+use App\Models\User;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use Laravel\Fortify\Fortify;
 
 class FortifyServiceProvider extends ServiceProvider
@@ -25,19 +28,19 @@ class FortifyServiceProvider extends ServiceProvider
      * Bootstrap any application services.
      */
     public function boot(): void
-{
-    $this->configureActions();
-    $this->configureViews();
-    $this->configureRateLimiting();
+    {
+        $this->configureActions();
+        $this->configureViews();
+        $this->configureRateLimiting();
 
-    // Si hay un QR de fiesta pendiente en sesión, redirigir allí tras login
-    Fortify::redirects('login', function () {
-        if ($qr = session()->pull('intended_party_qr')) {
-            return route('party.register', $qr);
-        }
-        return config('fortify.home');
-    });
-}
+        // Si hay un QR de fiesta pendiente en sesión, redirigir allí tras login
+        Fortify::redirects('login', function () {
+            if ($qr = session()->pull('intended_party_qr')) {
+                return route('party.register', $qr);
+            }
+            return config('fortify.home');
+        });
+    }
 
     /**
      * Configure Fortify actions.
@@ -46,6 +49,22 @@ class FortifyServiceProvider extends ServiceProvider
     {
         Fortify::resetUserPasswordsUsing(ResetUserPassword::class);
         Fortify::createUsersUsing(CreateNewUser::class);
+
+        Fortify::authenticateUsing(function (Request $request) {
+            $user = User::where('email', $request->email)->first();
+
+            if (! $user || ! Hash::check($request->password, $user->password)) {
+                return null;
+            }
+
+            if ($user->is_banned) {
+                throw ValidationException::withMessages([
+                    'email' => ['Tu cuenta ha sido suspendida. Contacta con el administrador.'],
+                ]);
+            }
+
+            return $user;
+        });
     }
 
     /**

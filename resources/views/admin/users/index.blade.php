@@ -53,6 +53,21 @@
             </div>
         </form>
 
+{{-- Banner filtro por fiesta --}}
+@isset($party)
+    <div class="flex items-center justify-between bg-vicio-900/30 border border-vicio-700/50 rounded-xl px-4 py-3 mb-4">
+        <div class="flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="size-4 text-vicio-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z" />
+            </svg>
+            <span class="text-vicio-300 text-sm font-medium">Filtrando por fiesta: <span class="text-white">{{ $party->name }}</span></span>
+        </div>
+        <a href="{{ route('admin.users.index') }}" wire:navigate class="text-zinc-500 hover:text-zinc-300 text-xs transition-colors">
+            Quitar filtro ✕
+        </a>
+    </div>
+@endisset   
+
         {{-- Tabla --}}
         <div class="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
             @if($users->isEmpty())

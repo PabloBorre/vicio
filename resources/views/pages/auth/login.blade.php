@@ -5,6 +5,12 @@
         <!-- Session Status -->
         <x-auth-session-status class="text-center" :status="session('status')" />
 
+        @if(request('banned'))
+    <div class="bg-red-900/30 border border-red-700/50 text-red-400 rounded-xl px-4 py-3 text-sm text-center">
+        Tu cuenta ha sido suspendida. Contacta con el administrador.
+    </div>
+@endif
+
         <form method="POST" action="{{ route('login.store') }}" class="flex flex-col gap-6">
             @csrf
 

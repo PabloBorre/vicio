@@ -10,32 +10,38 @@ use Illuminate\Validation\Rule;
 
 class AdminUserController extends Controller
 {
-    public function index(Request $request)
-    {
-        $query = User::with('currentParty')
-            ->orderByDesc('created_at');
+   public function index(Request $request)
+{
+    $query = User::with('currentParty')
+        ->orderByDesc('created_at');
 
-        // Búsqueda
-        if ($search = $request->get('search')) {
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('username', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%");
-            });
-        }
-
-        // Filtro
-        match ($request->get('filter')) {
-            'admins'  => $query->where('is_admin', true),
-            'banned'  => $query->where('is_banned', true),
-            default   => null,
-        };
-
-        $users = $query->paginate(20)->withQueryString();
-
-        return view('admin.users.index', compact('users'));
+    // Filtro por fiesta
+    $party = null;
+    if ($partyId = $request->get('party')) {
+        $query->whereHas('parties', fn($q) => $q->where('parties.id', $partyId));
+        $party = \App\Models\Party::find($partyId);
     }
 
+    // Búsqueda
+    if ($search = $request->get('search')) {
+        $query->where(function ($q) use ($search) {
+            $q->where('name', 'like', "%{$search}%")
+              ->orWhere('username', 'like', "%{$search}%")
+              ->orWhere('email', 'like', "%{$search}%");
+        });
+    }
+
+    // Filtro rol/estado
+    match ($request->get('filter')) {
+        'admins'  => $query->where('is_admin', true),
+        'banned'  => $query->where('is_banned', true),
+        default   => null,
+    };
+
+    $users = $query->paginate(20)->withQueryString();
+
+    return view('admin.users.index', compact('users', 'party'));
+}
     public function edit(User $user)
     {
         $user->load('currentParty');
@@ -96,18 +102,22 @@ class AdminUserController extends Controller
             ->with('success', 'Usuario eliminado correctamente.');
     }
 
-    public function toggleBan(User $user)
-    {
-        if ($user->id === auth()->id()) {
-            return back()->with('error', 'No puedes banearte a ti mismo.');
-        }
-
-        $user->update(['is_banned' => !$user->is_banned]);
-
-        $msg = $user->is_banned ? "Usuario {$user->username} baneado." : "Usuario {$user->username} desbaneado.";
-
-        return back()->with('success', $msg);
+public function toggleBan(User $user)
+{
+    if ($user->id === auth()->id()) {
+        return back()->with('error', 'No puedes banearte a ti mismo.');
     }
+
+    $user->update(['is_banned' => !$user->is_banned]);
+
+    if ($user->is_banned) {
+        event(new \App\Events\UserBanned($user));
+    }
+
+    $msg = $user->is_banned ? "Usuario {$user->username} baneado." : "Usuario {$user->username} desbaneado.";
+
+    return back()->with('success', $msg);
+}
 
     public function toggleAdmin(User $user)
     {

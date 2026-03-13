@@ -69,27 +69,29 @@ new #[Title('Inicio')] class extends Component
             </a>
         </div>
 
-        {{-- Fiesta activa si existe --}}
-        @if($currentParty = auth()->user()->currentParty)
-            <div class="w-full max-w-sm bg-vicio-900/30 border border-vicio-700/50 rounded-2xl p-4 flex items-center gap-4">
-                <div class="size-10 rounded-full vicio-gradient flex items-center justify-center shrink-0">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="size-5 fill-white" viewBox="0 0 24 24">
-                        <path d="M12 2C9.5 5 8 7.5 8 10c0 2.2 1.8 4 4 4s4-1.8 4-4c0-.5-.1-1-.2-1.4C17.2 10 18 11.9 18 14c0 3.3-2.7 6-6 6s-6-2.7-6-6c0-4 3-8 6-10z"/>
-                    </svg>
+{{-- Fiesta activa si existe (solo usuarios normales) --}}
+        @if(!auth()->user()->is_admin)
+            @if($currentParty = auth()->user()->currentParty)
+                <div class="w-full max-w-sm bg-vicio-900/30 border border-vicio-700/50 rounded-2xl p-4 flex items-center gap-4">
+                    <div class="size-10 rounded-full vicio-gradient flex items-center justify-center shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="size-5 fill-white" viewBox="0 0 24 24">
+                            <path d="M12 2C9.5 5 8 7.5 8 10c0 2.2 1.8 4 4 4s4-1.8 4-4c0-.5-.1-1-.2-1.4C17.2 10 18 11.9 18 14c0 3.3-2.7 6-6 6s-6-2.7-6-6c0-4 3-8 6-10z"/>
+                        </svg>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-white font-semibold text-sm truncate">{{ $currentParty->name }}</p>
+                        <p class="text-vicio-300 text-xs">Fiesta activa</p>
+                    </div>
+                    
+                    <a    href="{{ route('party.' . ($currentParty->status === 'active' ? 'swipe' : 'waiting'), $currentParty->qr_code) }}"
+                        wire:navigate
+                        class="shrink-0 text-vicio-300 text-sm font-semibold hover:text-vicio-200 transition-colors"
+                    >
+                        Entrar →
+                    </a>
                 </div>
-                <div class="flex-1 min-w-0">
-                    <p class="text-white font-semibold text-sm truncate">{{ $currentParty->name }}</p>
-                    <p class="text-vicio-300 text-xs">Fiesta activa</p>
-                </div>
-                <a
-                    href="{{ route('party.' . ($currentParty->status === 'active' ? 'swipe' : 'waiting'), $currentParty->qr_code) }}"
-                    wire:navigate
-                    class="shrink-0 text-vicio-300 text-sm font-semibold hover:text-vicio-200 transition-colors"
-                >
-                    Entrar →
-                </a>
-            </div>
-        @endif
+            @endif
+        @endif        
 
     </div>
 </x-layouts::app.sidebar>

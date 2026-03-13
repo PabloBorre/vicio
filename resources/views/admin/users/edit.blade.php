@@ -3,7 +3,7 @@
 
         {{-- Header --}}
         <div class="flex items-center gap-3">
-            <a href="{{ route('admin.users.index') }}" wire:navigate
+            <a href="{{ route('admin.users.index') }}"
                 class="size-9 rounded-full bg-zinc-800 hover:bg-zinc-700 flex items-center justify-center transition-colors flex-shrink-0">
                 <svg xmlns="http://www.w3.org/2000/svg" class="size-4 text-zinc-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
@@ -22,7 +22,7 @@
                 </div>
                 <div class="min-w-0">
                     <h1 class="text-white text-xl font-bold truncate">{{ $user->name }}</h1>
-                    <p class="text-zinc-500 text-sm">@{{ $user->username ?? 'sin usuario' }}</p>
+                    <p class="text-zinc-500 text-sm">&#64;{{ $user->username ?? 'sin usuario' }}</p>
                 </div>
             </div>
         </div>
@@ -65,9 +65,15 @@
             </div>
         </div>
 
-        {{-- Formulario --}}
-        <form method="POST" action="{{ route('admin.users.update', $user) }}" enctype="multipart/form-data" class="space-y-5">
-            @csrf @method('PUT')
+        {{-- Formulario principal --}}
+        <form
+            method="POST"
+            action="{{ route('admin.users.update', $user) }}"
+            enctype="multipart/form-data"
+            class="space-y-5"
+        >
+            @csrf
+            @method('PUT')
 
             {{-- Foto de perfil --}}
             <div class="space-y-2">
@@ -90,7 +96,7 @@
                 @enderror
             </div>
 
-            {{-- Nombre --}}
+            {{-- Nombre completo --}}
             <div class="space-y-1.5">
                 <label class="text-sm font-medium text-zinc-300">Nombre completo *</label>
                 <input
@@ -109,7 +115,7 @@
             <div class="space-y-1.5">
                 <label class="text-sm font-medium text-zinc-300">Username *</label>
                 <div class="relative">
-                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 text-sm">@</span>
+                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 text-sm select-none">@</span>
                     <input
                         type="text"
                         name="username"
@@ -144,7 +150,8 @@
                     type="number"
                     name="age"
                     value="{{ old('age', $user->age) }}"
-                    min="18" max="99"
+                    min="18"
+                    max="99"
                     class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-3 text-white placeholder-zinc-600 focus:outline-none focus:border-vicio-400 focus:ring-1 focus:ring-vicio-400 transition-colors text-sm"
                 >
                 @error('age')
@@ -155,25 +162,35 @@
             {{-- Identidad de género --}}
             <div class="space-y-1.5">
                 <label class="text-sm font-medium text-zinc-300">Identidad de género</label>
-                <select name="gender_identity"
-                    class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-vicio-400 focus:ring-1 focus:ring-vicio-400 transition-colors text-sm">
+                <select
+                    name="gender_identity"
+                    class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-vicio-400 focus:ring-1 focus:ring-vicio-400 transition-colors text-sm"
+                >
                     <option value="">— Sin especificar —</option>
                     @foreach(['man' => 'Hombre', 'woman' => 'Mujer', 'non_binary' => 'No binario', 'other' => 'Otro'] as $val => $label)
                         <option value="{{ $val }}" @selected(old('gender_identity', $user->gender_identity) === $val)>{{ $label }}</option>
                     @endforeach
                 </select>
+                @error('gender_identity')
+                    <p class="text-red-400 text-xs">{{ $message }}</p>
+                @enderror
             </div>
 
             {{-- Preferencia sexual --}}
             <div class="space-y-1.5">
                 <label class="text-sm font-medium text-zinc-300">Preferencia sexual</label>
-                <select name="sexual_preference"
-                    class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-vicio-400 focus:ring-1 focus:ring-vicio-400 transition-colors text-sm">
+                <select
+                    name="sexual_preference"
+                    class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-vicio-400 focus:ring-1 focus:ring-vicio-400 transition-colors text-sm"
+                >
                     <option value="">— Sin especificar —</option>
                     @foreach(['hetero' => 'Heterosexual', 'homo' => 'Homosexual', 'bi' => 'Bisexual', 'pan' => 'Pansexual'] as $val => $label)
                         <option value="{{ $val }}" @selected(old('sexual_preference', $user->sexual_preference) === $val)>{{ $label }}</option>
                     @endforeach
                 </select>
+                @error('sexual_preference')
+                    <p class="text-red-400 text-xs">{{ $message }}</p>
+                @enderror
             </div>
 
             {{-- Bio --}}
@@ -192,12 +209,16 @@
 
             {{-- Botones --}}
             <div class="flex gap-3 pt-2">
-                <a href="{{ route('admin.users.index') }}" wire:navigate
-                    class="flex-1 bg-zinc-800 text-zinc-300 font-semibold py-3 rounded-xl text-center hover:bg-zinc-700 transition-colors text-sm">
+                <a
+                    href="{{ route('admin.users.index') }}"
+                    class="flex-1 bg-zinc-800 text-zinc-300 font-semibold py-3 rounded-xl text-center hover:bg-zinc-700 transition-colors text-sm"
+                >
                     Cancelar
                 </a>
-                <button type="submit"
-                    class="flex-1 vicio-gradient text-white font-semibold py-3 rounded-xl hover:opacity-90 transition-opacity text-sm">
+                <button
+                    type="submit"
+                    class="flex-1 vicio-gradient text-white font-semibold py-3 rounded-xl hover:opacity-90 transition-opacity text-sm"
+                >
                     Guardar cambios
                 </button>
             </div>

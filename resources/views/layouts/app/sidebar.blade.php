@@ -121,6 +121,27 @@
     @include('partials.push-prompt')
 @endauth
 
+@auth
+@if(!auth()->user()->is_admin)
+<script>
+    window.addEventListener('load', () => {
+        Echo.private('user.{{ auth()->id() }}')
+            .listen('.banned', () => {
+                fetch('/logout', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'Content-Type': 'application/json',
+                    },
+                }).finally(() => {
+                    window.location.href = '/login?banned=1';
+                });
+            });
+    });
+</script>
+@endif
+@endauth
+
 @fluxScripts
 </body>
 </html>

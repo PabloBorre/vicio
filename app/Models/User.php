@@ -5,13 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Fortify\TwoFactorAuthenticatable;
 use NotificationChannels\WebPush\HasPushSubscriptions;
 use App\Models\PartyMatch;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable, HasPushSubscriptions;
-
+    use HasFactory, Notifiable, HasPushSubscriptions, TwoFactorAuthenticatable; 
     protected $fillable = [
         'name', 'username', 'email', 'password',
         'profile_photo_path', 'age', 'gender_identity',

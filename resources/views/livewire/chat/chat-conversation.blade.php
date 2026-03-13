@@ -205,16 +205,7 @@
                         @endif
                     </span>
                 @endif
- 
-                @if($other->sexual_preference)
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-zinc-800 border border-zinc-700 text-zinc-300 text-xs font-medium">
-                        @if($other->sexual_preference === 'hetero') 💛 Hetero
-                        @elseif($other->sexual_preference === 'homo') 🏳️‍🌈 Homo
-                        @elseif($other->sexual_preference === 'bi') 💜 Bi
-                        @else {{ ucfirst($other->sexual_preference) }}
-                        @endif
-                    </span>
-                @endif
+
             </div>
 
             {{-- Bio --}}

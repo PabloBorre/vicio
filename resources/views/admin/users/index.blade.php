@@ -95,7 +95,7 @@
                                             </div>
                                             <div>
                                                 <p class="text-white font-medium leading-tight">{{ $user->name }}</p>
-                                                <p class="text-zinc-500 text-xs">@{{ $user->username ?? '—' }}</p>
+                                                <p class="text-zinc-500 text-xs">&#64;{{ $user->username ?? '—' }}</p>
                                             </div>
                                         </div>
                                     </td>

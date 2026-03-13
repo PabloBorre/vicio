@@ -16,7 +16,7 @@
     wire:poll.10s="checkPartyStatus"
 >
 
-<div class="mb-6 w-full flex justify-start">
+<div class="absolute top-4 left-4">
     <a href="{{ route('dashboard') }}"
         wire:navigate
         class="inline-flex items-center gap-2 text-zinc-400 hover:text-white text-sm font-medium transition-colors">

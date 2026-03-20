@@ -122,6 +122,11 @@
 @endauth
 
 @auth
+<livewire:chat.chat-notification />
+    @if(!auth()->user()->is_admin)
+        <livewire:auth.ban-watcher />
+    @endif
+    @include('partials.push-prompt')
 @if(!auth()->user()->is_admin)
 <script>
     window.addEventListener('load', () => {

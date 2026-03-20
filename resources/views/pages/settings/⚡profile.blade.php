@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Title;
 use Livewire\Component;
+use App\Support\ImageHelper;
 use Livewire\WithFileUploads;
 
 new #[Title('Ajustes de perfil')] class extends Component {
@@ -40,7 +41,6 @@ new #[Title('Ajustes de perfil')] class extends Component {
             'email'             => ['required', 'email', 'max:255', 'unique:users,email,' . $user->id],
             'bio'               => ['nullable', 'string', 'max:500'],
             'age'               => ['required', 'integer', 'min:18', 'max:99'],
-            'gender_identity'   => ['required', 'in:man,woman'],
             'sexual_preference' => ['required', 'in:hetero,homo,bi'],
             'photo'             => ['nullable', 'image', 'max:5120', 'mimes:jpg,jpeg,png,webp'],
         ], [
@@ -54,8 +54,7 @@ new #[Title('Ajustes de perfil')] class extends Component {
             if ($user->profile_photo_path) {
                 Storage::disk('public')->delete($user->profile_photo_path);
             }
-            $validated['profile_photo_path'] = $this->photo->store('profile-photos', 'public');
-        }
+$validated['profile_photo_path'] = ImageHelper::storeAsWebP($this->photo);        }
         unset($validated['photo']);
 
         if (isset($validated['email']) && $validated['email'] !== $user->email) {
@@ -116,66 +115,54 @@ new #[Title('Ajustes de perfil')] class extends Component {
             {{-- EDAD --}}
             <flux:input wire:model="age" label="Edad" type="number" min="18" max="99" required />
 
-            {{-- GENERO --}}
+            {{-- GENERO (solo lectura) --}}
             <div class="space-y-2">
                 <label class="text-sm font-medium text-zinc-300">Me identifico como</label>
-                <div class="grid grid-cols-2 gap-3">
-                    <button type="button" wire:click="$set('gender_identity', 'man')"
-                        @class([
-                            'flex flex-col items-center gap-1.5 py-4 rounded-2xl text-sm font-semibold border-2 transition-all duration-200',
-                            'bg-vicio-600 text-white border-vicio-500' => $gender_identity === 'man',
-                            'bg-zinc-900 text-zinc-400 border-zinc-700 hover:border-zinc-500 hover:text-zinc-300' => $gender_identity !== 'man',
-                        ])>
-                        <span class="text-2xl">👨</span>
-                        <span>Hombre</span>
-                    </button>
-                    <button type="button" wire:click="$set('gender_identity', 'woman')"
-                        @class([
-                            'flex flex-col items-center gap-1.5 py-4 rounded-2xl text-sm font-semibold border-2 transition-all duration-200',
-                            'bg-vicio-600 text-white border-vicio-500' => $gender_identity === 'woman',
-                            'bg-zinc-900 text-zinc-400 border-zinc-700 hover:border-zinc-500 hover:text-zinc-300' => $gender_identity !== 'woman',
-                        ])>
-                        <span class="text-2xl">👩</span>
-                        <span>Mujer</span>
-                    </button>
+                <div class="flex items-center gap-3 px-4 py-3 bg-zinc-900 border border-zinc-800 rounded-xl">
+                    <span class="text-xl">
+                        {{ $gender_identity === 'man' ? '👨' : '👩' }}
+                    </span>
+                    <span class="text-white text-sm font-medium">
+                        {{ $gender_identity === 'man' ? 'Hombre' : 'Mujer' }}
+                    </span>
+                    <span class="ml-auto text-zinc-600 text-xs">No modificable</span>
                 </div>
-                @error('gender_identity') <p class="text-red-400 text-xs">{{ $message }}</p> @enderror
             </div>
 
             {{-- PREFERENCIA --}}
-<div class="space-y-2">
-    <label class="text-sm font-medium text-zinc-300">Me gustan</label>
-    <div class="grid grid-cols-3 gap-3">
-        <button type="button" wire:click="$set('sexual_preference', 'hetero')"
-            @class([
-                'flex flex-col items-center gap-1.5 py-4 rounded-2xl text-sm font-semibold border-2 transition-all duration-200',
-                'bg-vicio-600 text-white border-vicio-500'                                        => $sexual_preference === 'hetero',
-                'bg-zinc-900 text-zinc-400 border-zinc-700 hover:border-zinc-500 hover:text-zinc-300' => $sexual_preference !== 'hetero',
-            ])>
-            <span class="text-2xl">👨</span>
-            <span class="text-xs text-center leading-tight">Hombres</span>
-        </button>
-        <button type="button" wire:click="$set('sexual_preference', 'homo')"
-            @class([
-                'flex flex-col items-center gap-1.5 py-4 rounded-2xl text-sm font-semibold border-2 transition-all duration-200',
-                'bg-vicio-600 text-white border-vicio-500'                                        => $sexual_preference === 'homo',
-                'bg-zinc-900 text-zinc-400 border-zinc-700 hover:border-zinc-500 hover:text-zinc-300' => $sexual_preference !== 'homo',
-            ])>
-            <span class="text-2xl">👩</span>
-            <span class="text-xs text-center leading-tight">Mujeres</span>
-        </button>
-        <button type="button" wire:click="$set('sexual_preference', 'bi')"
-            @class([
-                'flex flex-col items-center gap-1.5 py-4 rounded-2xl text-sm font-semibold border-2 transition-all duration-200',
-                'bg-vicio-600 text-white border-vicio-500'                                        => $sexual_preference === 'bi',
-                'bg-zinc-900 text-zinc-400 border-zinc-700 hover:border-zinc-500 hover:text-zinc-300' => $sexual_preference !== 'bi',
-            ])>
-            <span class="text-2xl">💞</span>
-            <span class="text-xs text-center leading-tight">Ambos</span>
-        </button>
-    </div>
-    @error('sexual_preference') <p class="text-red-400 text-xs">{{ $message }}</p> @enderror
-</div>
+            <div class="space-y-2">
+                <label class="text-sm font-medium text-zinc-300">Me gustan</label>
+                <div class="grid grid-cols-3 gap-3">
+                    <button type="button" wire:click="$set('sexual_preference', 'hetero')"
+                        @class([
+                            'flex flex-col items-center gap-1.5 py-4 rounded-2xl text-sm font-semibold border-2 transition-all duration-200',
+                            'bg-vicio-600 text-white border-vicio-500'                                        => $sexual_preference === 'hetero',
+                            'bg-zinc-900 text-zinc-400 border-zinc-700 hover:border-zinc-500 hover:text-zinc-300' => $sexual_preference !== 'hetero',
+                        ])>
+                        <span class="text-2xl">👨</span>
+                        <span class="text-xs text-center leading-tight">Hombres</span>
+                    </button>
+                    <button type="button" wire:click="$set('sexual_preference', 'homo')"
+                        @class([
+                            'flex flex-col items-center gap-1.5 py-4 rounded-2xl text-sm font-semibold border-2 transition-all duration-200',
+                            'bg-vicio-600 text-white border-vicio-500'                                        => $sexual_preference === 'homo',
+                            'bg-zinc-900 text-zinc-400 border-zinc-700 hover:border-zinc-500 hover:text-zinc-300' => $sexual_preference !== 'homo',
+                        ])>
+                        <span class="text-2xl">👩</span>
+                        <span class="text-xs text-center leading-tight">Mujeres</span>
+                    </button>
+                    <button type="button" wire:click="$set('sexual_preference', 'bi')"
+                        @class([
+                            'flex flex-col items-center gap-1.5 py-4 rounded-2xl text-sm font-semibold border-2 transition-all duration-200',
+                            'bg-vicio-600 text-white border-vicio-500'                                        => $sexual_preference === 'bi',
+                            'bg-zinc-900 text-zinc-400 border-zinc-700 hover:border-zinc-500 hover:text-zinc-300' => $sexual_preference !== 'bi',
+                        ])>
+                        <span class="text-2xl">💞</span>
+                        <span class="text-xs text-center leading-tight">Ambos</span>
+                    </button>
+                </div>
+                @error('sexual_preference') <p class="text-red-400 text-xs">{{ $message }}</p> @enderror
+            </div>
 
             {{-- BIO --}}
             <div class="space-y-1.5">

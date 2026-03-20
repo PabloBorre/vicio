@@ -7,10 +7,11 @@
 
     <livewire:party.swipe-engine :party="$party" />
 
-    @auth
-        <livewire:chat.chat-notification />
-        @include('partials.push-prompt')
-    @endauth
+@auth
+    <livewire:chat.chat-notification />
+    <livewire:auth.ban-watcher />
+    @include('partials.push-prompt')
+@endauth
 
     @fluxScripts
 </body>

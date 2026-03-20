@@ -160,38 +160,28 @@
             </div>
 
             {{-- Identidad de género --}}
-            <div class="space-y-1.5">
-                <label class="text-sm font-medium text-zinc-300">Identidad de género</label>
-                <select
-                    name="gender_identity"
-                    class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-vicio-400 focus:ring-1 focus:ring-vicio-400 transition-colors text-sm"
-                >
-                    <option value="">— Sin especificar —</option>
-                    @foreach(['man' => 'Hombre', 'woman' => 'Mujer', 'non_binary' => 'No binario', 'other' => 'Otro'] as $val => $label)
-                        <option value="{{ $val }}" @selected(old('gender_identity', $user->gender_identity) === $val)>{{ $label }}</option>
-                    @endforeach
-                </select>
-                @error('gender_identity')
-                    <p class="text-red-400 text-xs">{{ $message }}</p>
-                @enderror
-            </div>
+<div class="space-y-1.5">
+    <label class="text-sm font-medium text-zinc-300">Identidad de género</label>
+    <select name="gender_identity"
+        class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-vicio-400 focus:ring-1 focus:ring-vicio-400 transition-colors text-sm">
+        <option value="">— Sin especificar —</option>
+        @foreach(['man' => 'Hombre', 'woman' => 'Mujer'] as $val => $label)
+            <option value="{{ $val }}" @selected(old('gender_identity', $user->gender_identity) === $val)>{{ $label }}</option>
+        @endforeach
+    </select>
+</div>
 
             {{-- Preferencia sexual --}}
-            <div class="space-y-1.5">
-                <label class="text-sm font-medium text-zinc-300">Preferencia sexual</label>
-                <select
-                    name="sexual_preference"
-                    class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-vicio-400 focus:ring-1 focus:ring-vicio-400 transition-colors text-sm"
-                >
-                    <option value="">— Sin especificar —</option>
-                    @foreach(['hetero' => 'Heterosexual', 'homo' => 'Homosexual', 'bi' => 'Bisexual', 'pan' => 'Pansexual'] as $val => $label)
-                        <option value="{{ $val }}" @selected(old('sexual_preference', $user->sexual_preference) === $val)>{{ $label }}</option>
-                    @endforeach
-                </select>
-                @error('sexual_preference')
-                    <p class="text-red-400 text-xs">{{ $message }}</p>
-                @enderror
-            </div>
+<div class="space-y-1.5">
+    <label class="text-sm font-medium text-zinc-300">Preferencia sexual</label>
+    <select name="sexual_preference"
+        class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-vicio-400 focus:ring-1 focus:ring-vicio-400 transition-colors text-sm">
+        <option value="">— Sin especificar —</option>
+        @foreach(['man' => 'Hombre', 'woman' => 'Mujeres', 'bi' => 'Ambos'] as $val => $label)
+            <option value="{{ $val }}" @selected(old('sexual_preference', $user->sexual_preference) === $val)>{{ $label }}</option>
+        @endforeach
+    </select>
+</div>
 
             {{-- Bio --}}
             <div class="space-y-1.5">

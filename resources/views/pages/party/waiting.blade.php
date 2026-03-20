@@ -8,9 +8,10 @@
     <livewire:party.party-waiting :party="$party" />
 
     @auth
-        <livewire:chat.chat-notification />
-        @include('partials.push-prompt')
-    @endauth
+    <livewire:chat.chat-notification />
+    <livewire:auth.ban-watcher />
+    @include('partials.push-prompt')
+@endauth
 
     @fluxScripts
 </body>

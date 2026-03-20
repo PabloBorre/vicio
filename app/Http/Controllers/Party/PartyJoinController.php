@@ -114,8 +114,7 @@ class PartyJoinController extends Controller
             'profile_photo.image'        => 'El archivo debe ser una imagen.',
         ]);
 
-        $photoPath = $request->file('profile_photo')->store('profile-photos', 'public');
-
+        $photoPath = ImageHelper::storeAsWebP($request->file('profile_photo'));
         $user = User::create([
             'name'               => $request->name,
             'username'           => $request->username,

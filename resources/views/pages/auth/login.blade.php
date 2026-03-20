@@ -1,65 +1,103 @@
-<x-layouts::auth :title="__('Log in')">
-    <div class="flex flex-col gap-6">
-        <x-auth-header :title="__('Log in to your account')" :description="__('Enter your email and password below to log in')" />
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+    @include('partials.head')
+</head>
+<body class="min-h-screen antialiased" style="background-color: #A678C8 !important">
+    <div class="flex flex-col items-center justify-between min-h-screen px-6" style="padding-top: 80px; padding-bottom: 56px;">
 
-        <!-- Session Status -->
-        <x-auth-session-status class="text-center" :status="session('status')" />
+        {{-- Logo arriba --}}
+        <div class="flex flex-col items-center gap-3">
+            <img src="{{ asset('images/logo.png') }}" alt="VicioApp" width="70" height="70">
+            <span class="text-white font-bold text-2xl tracking-tight">VicioApp</span>
+        </div>
 
-        @if(request('banned'))
-    <div class="bg-red-900/30 border border-red-700/50 text-red-400 rounded-xl px-4 py-3 text-sm text-center">
-        Tu cuenta ha sido suspendida. Contacta con el administrador.
+        {{-- Formulario --}}
+        <div class="w-full max-w-sm flex flex-col gap-4">
+
+            <x-auth-session-status class="text-center text-purple-100 text-sm" :status="session('status')" />
+
+            @if(request('banned'))
+                <div class="rounded-2xl px-4 py-3 text-sm text-center text-red-200" style="background-color: #2D1B4E;">
+                    Tu cuenta ha sido suspendida. Contacta con el administrador.
+                </div>
+            @endif
+
+            <form method="POST" action="{{ route('login.store') }}" class="flex flex-col gap-4">
+                @csrf
+
+                {{-- Email --}}
+                <div>
+                    <input
+                        type="email"
+                        name="email"
+                        value="{{ old('email') }}"
+                        placeholder="Tu email"
+                        required
+                        autofocus
+                        autocomplete="email"
+                        style="background-color: #2D1B4E; border:none; border-radius:9999px; font-size:16px; padding:18px 24px; color:white; outline:none; width:100%;"
+                    />
+                    @error('email')
+                        <p class="text-red-200 text-xs mt-1 px-4">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                {{-- Contraseña --}}
+                <div>
+                    <input
+                        type="password"
+                        name="password"
+                        placeholder="Contraseña"
+                        required
+                        autocomplete="current-password"
+                        style="background-color: #2D1B4E; border:none; border-radius:9999px; font-size:16px; padding:18px 24px; color:white; outline:none; width:100%;"
+                    />
+                    @error('password')
+                        <p class="text-red-200 text-xs mt-1 px-4">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                {{-- Recuérdame + olvidaste contraseña --}}
+                <div class="flex items-center justify-between px-2">
+                    <label class="flex items-center gap-2 text-sm text-purple-100 cursor-pointer">
+                        <input type="checkbox" name="remember" {{ old('remember') ? 'checked' : '' }}>
+                        Recuérdame
+                    </label>
+                    @if (Route::has('password.request'))
+                        <a href="{{ route('password.request') }}" class="text-sm text-purple-100 underline">
+                            ¿Olvidaste tu contraseña?
+                        </a>
+                    @endif
+                </div>
+
+                {{-- Botón entrar --}}
+                <button
+                    type="submit"
+                    style="background-color: #2D1B4E; border:none; border-radius:9999px; padding:20px 24px; font-size:20px; font-weight:700; color:white; cursor:pointer; width:100%;"
+                >
+                    Iniciar sesión
+                </button>
+
+            </form>
+
+            {{-- Link registro --}}
+            @if (Route::has('register'))
+                <p class="text-center text-sm text-purple-100">
+                    ¿No tienes cuenta?
+                    <a href="{{ route('register') }}" class="font-bold underline text-white">Crear cuenta</a>
+                </p>
+            @endif
+
+        </div>
+
+        {{-- Texto inferior --}}
+        <p class="text-center text-purple-100 text-xs opacity-60">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit
+        </p>
+
     </div>
-@endif
 
-        <form method="POST" action="{{ route('login.store') }}" class="flex flex-col gap-6">
-            @csrf
-
-            <!-- Email Address -->
-            <flux:input
-                name="email"
-                :label="__('Email address')"
-                :value="old('email')"
-                type="email"
-                required
-                autofocus
-                autocomplete="email"
-                placeholder="email@example.com"
-            />
-
-            <!-- Password -->
-            <div class="relative">
-                <flux:input
-                    name="password"
-                    :label="__('Password')"
-                    type="password"
-                    required
-                    autocomplete="current-password"
-                    :placeholder="__('Password')"
-                    viewable
-                />
-
-                @if (Route::has('password.request'))
-                    <flux:link class="absolute top-0 text-sm end-0" :href="route('password.request')" wire:navigate>
-                        {{ __('Forgot your password?') }}
-                    </flux:link>
-                @endif
-            </div>
-
-            <!-- Remember Me -->
-            <flux:checkbox name="remember" :label="__('Remember me')" :checked="old('remember')" />
-
-            <div class="flex items-center justify-end">
-                <flux:button variant="primary" type="submit" class="w-full" data-test="login-button">
-                    {{ __('Log in') }}
-                </flux:button>
-            </div>
-        </form>
-
-        @if (Route::has('register'))
-            <div class="space-x-1 text-sm text-center rtl:space-x-reverse text-zinc-600 dark:text-zinc-400">
-                <span>{{ __('Don\'t have an account?') }}</span>
-                <flux:link :href="route('register')" wire:navigate>{{ __('Sign up') }}</flux:link>
-            </div>
-        @endif
-    </div>
-</x-layouts::auth>
+    @fluxScripts
+</body>
+</html>

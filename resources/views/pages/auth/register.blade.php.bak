@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+    @include('partials.head')
+</head>
+<body class="min-h-screen antialiased" style="background-color: #9B6BB5;">
+
+    {{-- ── HEADER ── --}}
+    <div class="flex items-center justify-between px-5 pt-6 pb-2">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 65" class="w-12 h-auto">
+            <path d="M50,30 C42,15 25,10 8,28 C20,42 35,48 50,43Z" fill="#7B4FA6"/>
+            <path d="M50,30 C58,15 75,10 92,28 C80,42 65,48 50,43Z" fill="#D4A8D4"/>
+            <path d="M8,28 C20,42 35,48 50,43 C35,55 18,55 8,28Z" fill="#7B4FA6"/>
+            <path d="M92,28 C80,42 65,48 50,43 C65,55 82,55 92,28Z" fill="#D4A8D4"/>
+            <ellipse cx="50" cy="36" rx="5" ry="3.5" fill="#2D0A4E"/>
+        </svg>
+        <span class="text-white font-bold text-lg tracking-tight">VicioApp</span>
+    </div>
+
+    <div class="px-5 pb-16 flex flex-col gap-4">
+
+        <form method="POST" action="{{ route('register') }}" enctype="multipart/form-data" class="flex flex-col gap-4">
+            @csrf
+
+            {{-- ── FOTO DE PERFIL ── --}}
+            <div class="flex justify-center my-4">
+                <label for="profile_photo" class="cursor-pointer relative">
+                    {{-- Texto curvo SVG --}}
+                    <svg viewBox="0 0 200 200" class="w-48 h-48 absolute inset-0">
+                        <defs>
+                            <path id="circle-text" d="M 100,100 m -70,0 a 70,70 0 1,1 140,0 a 70,70 0 1,1 -140,0"/>
+                        </defs>
+                        <text font-size="13" fill="white" font-weight="600" font-family="sans-serif" letter-spacing="1">
+                            <textPath href="#circle-text" startOffset="5%">
+                                La foto más viciosa de tu galería, pero sin pasarte
+                            </textPath>
+                        </text>
+                    </svg>
+
+                    {{-- Avatar --}}
+                    <div class="w-48 h-48 rounded-full flex items-center justify-center overflow-hidden"
+                         style="background-color: #E8D5E8;">
+                        <img id="photo-preview" src="" alt="" class="w-full h-full object-cover hidden rounded-full"/>
+                        <svg id="photo-placeholder" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-20 h-20" fill="#5a3a7a">
+                            <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/>
+                        </svg>
+                    </div>
+
+                    <input
+                        type="file"
+                        id="profile_photo"
+                        name="profile_photo"
+                        accept="image/*"
+                        class="hidden"
+                        onchange="
+                            const file = this.files[0];
+                            if (file) {
+                                const reader = new FileReader();
+                                reader.onload = e => {
+                                    document.getElementById('photo-preview').src = e.target.result;
+                                    document.getElementById('photo-preview').classList.remove('hidden');
+                                    document.getElementById('photo-placeholder').classList.add('hidden');
+                                };
+                                reader.readAsDataURL(file);
+                            }
+                        "
+                    />
+                </label>
+            </div>
+            @error('profile_photo')
+                <p class="text-red-200 text-xs text-center -mt-2">{{ $message }}</p>
+            @enderror
+
+            {{-- ── CAMPOS DE TEXTO ── --}}
+            @foreach([
+                ['name' => 'name',                  'type' => 'text',     'placeholder' => 'Tu nombre de viciosx',       'autocomplete' => 'name'],
+                ['name' => 'username',               'type' => 'text',     'placeholder' => 'Nombre de usuario',          'autocomplete' => 'username'],
+                ['name' => 'email',                  'type' => 'email',    'placeholder' => 'Tu email',                   'autocomplete' => 'email'],
+                ['name' => 'password',               'type' => 'password', 'placeholder' => 'Contraseña 👁',              'autocomplete' => 'new-password'],
+                ['name' => 'password_confirmation',  'type' => 'password', 'placeholder' => 'Repite la contraseña porfa 👁', 'autocomplete' => 'new-password'],
+                ['name' => 'age',                    'type' => 'number',   'placeholder' => 'Edad, pero sin mentir',      'autocomplete' => 'off'],
+            ] as $field)
+                <div>
+                    <input
+                        type="{{ $field['type'] }}"
+                        name="{{ $field['name'] }}"
+                        value="{{ in_array($field['name'], ['password','password_confirmation']) ? '' : old($field['name']) }}"
+                        placeholder="{{ $field['placeholder'] }}"
+                        autocomplete="{{ $field['autocomplete'] }}"
+                        @if($field['name'] === 'age') min="18" max="99" @endif
+                        required
+                        style="background-color: #2D0A4E; border: none; border-radius: 9999px; font-size: 16px;"
+                        class="w-full px-6 py-4 text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-purple-300"
+                    />
+                    @error($field['name'])
+                        <p class="text-red-200 text-xs mt-1 px-4">{{ $message }}</p>
+                    @enderror
+                </div>
+            @endforeach
+
+            {{-- ── BIO ── --}}
+            <div>
+                <textarea
+                    name="bio"
+                    rows="3"
+                    required
+                    minlength="10"
+                    maxlength="500"
+                    placeholder="Cuéntanos algo de ti, pero tómatelo en serio, más que en tu bio de Insta"
+                    style="background-color: #2D0A4E; border: none; border-radius: 28px; font-size: 16px;"
+                    class="w-full px-6 py-4 text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-purple-300 resize-none"
+                >{{ old('bio') }}</textarea>
+                @error('bio')
+                    <p class="text-red-200 text-xs mt-1 px-4">{{ $message }}</p>
+                @enderror
+            </div>
+
+            {{-- ── GÉNERO (burbujas solapadas) ── --}}
+            <div class="space-y-3 mt-2">
+                <p class="text-white text-sm text-center">Me identifico como:</p>
+                <div class="flex justify-center" style="gap: 0;">
+                    <button type="button" data-group="gender_identity" data-value="man" onclick="selectOption(this)"
+                        class="option-btn w-32 h-32 rounded-full font-semibold text-sm transition-all duration-200 -mr-6"
+                        style="background-color: #C8A8D8; color: #2D0A4E; z-index: 1;">
+                        Hombre
+                    </button>
+                    <button type="button" data-group="gender_identity" data-value="woman" onclick="selectOption(this)"
+                        class="option-btn w-32 h-32 rounded-full font-semibold text-sm transition-all duration-200 -mr-6"
+                        style="background-color: #D8B8E8; color: #2D0A4E; z-index: 2;">
+                        Mujer
+                    </button>
+                    <button type="button" data-group="gender_identity" data-value="other" onclick="selectOption(this)"
+                        class="option-btn w-32 h-32 rounded-full font-semibold text-sm transition-all duration-200"
+                        style="background-color: #E8C8F0; color: #2D0A4E; z-index: 3;">
+                        Otro
+                    </button>
+                </div>
+                <input type="hidden" name="gender_identity" id="gender_identity" value="{{ old('gender_identity') }}" required/>
+                @error('gender_identity')
+                    <p class="text-red-200 text-xs text-center">{{ $message }}</p>
+                @enderror
+            </div>
+
+            {{-- ── PREFERENCIA SEXUAL (burbujas solapadas) ── --}}
+            <div class="space-y-3 mt-2">
+                <p class="text-white text-sm text-center">Me gustan:</p>
+                <div class="flex justify-center" style="gap: 0;">
+                    <button type="button" data-group="sexual_preference" data-value="man" onclick="selectOption(this)"
+                        class="option-btn w-32 h-32 rounded-full font-semibold text-sm transition-all duration-200 -mr-6"
+                        style="background-color: #C8A8D8; color: #2D0A4E; z-index: 1;">
+                        Hombres
+                    </button>
+                    <button type="button" data-group="sexual_preference" data-value="woman" onclick="selectOption(this)"
+                        class="option-btn w-32 h-32 rounded-full font-semibold text-sm transition-all duration-200 -mr-6"
+                        style="background-color: #D8B8E8; color: #2D0A4E; z-index: 2;">
+                        Mujeres
+                    </button>
+                    <button type="button" data-group="sexual_preference" data-value="bi" onclick="selectOption(this)"
+                        class="option-btn w-32 h-32 rounded-full font-semibold text-sm transition-all duration-200"
+                        style="background-color: #E8C8F0; color: #2D0A4E; z-index: 3;">
+                        Todos
+                    </button>
+                </div>
+                <input type="hidden" name="sexual_preference" id="sexual_preference" value="{{ old('sexual_preference') }}" required/>
+                @error('sexual_preference')
+                    <p class="text-red-200 text-xs text-center">{{ $message }}</p>
+                @enderror
+            </div>
+
+            {{-- ── BOTÓN CREAR CUENTA ── --}}
+            <button
+                type="submit"
+                class="w-full font-bold text-xl text-[#2D0A4E] mt-4 transition-colors hover:opacity-90"
+                style="background-color: #D4A8D4; padding: 28px 24px; border-radius: 9999px;"
+            >
+                Crear cuenta
+            </button>
+
+        </form>
+
+        {{-- ── LINK LOGIN ── --}}
+        <p class="text-center text-sm" style="color: #2D0A4E;">
+            ¿Ya tienes cuenta?
+            <a href="{{ route('login') }}" class="font-bold underline" style="color: #2D0A4E;">Iniciar sesión</a>
+        </p>
+
+    </div>
+
+    <script>
+        const ACTIVE   = ['ring-4', 'ring-white', 'scale-110', 'brightness-110'];
+        const INACTIVE = ['ring-4', 'ring-white', 'scale-110', 'brightness-110'];
+
+        function selectOption(btn) {
+            const group = btn.dataset.group;
+            document.querySelectorAll(`[data-group="${group}"]`).forEach(b => {
+                b.style.filter = '';
+                b.style.transform = '';
+                b.style.outline = '';
+            });
+            btn.style.filter = 'brightness(1.2)';
+            btn.style.transform = 'scale(1.08)';
+            btn.style.outline = '3px solid white';
+            document.getElementById(group).value = btn.dataset.value;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            ['gender_identity', 'sexual_preference'].forEach(group => {
+                const val = document.getElementById(group).value;
+                if (val) {
+                    const btn = document.querySelector(`[data-group="${group}"][data-value="${val}"]`);
+                    if (btn) selectOption(btn);
+                }
+            });
+        });
+    </script>
+
+    @fluxScripts
+</body>
+</html>

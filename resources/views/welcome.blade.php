@@ -3,55 +3,60 @@
 <head>
     @include('partials.head')
 </head>
-<body class="min-h-screen bg-zinc-950 flex flex-col items-center justify-center px-6 text-white">
+<body class="min-h-screen antialiased text-white" style="background-color: #A678C8 !important">
+        <div class="flex flex-col items-center justify-between min-h-screen px-6" style="padding-top: 80px; padding-bottom: 56px;">
 
-    {{-- Logo + nombre --}}
-    <div class="flex flex-col items-center gap-4 mb-10">
-        <div class="size-20 rounded-full bg-zinc-800 flex items-center justify-center border border-zinc-700">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="size-10 fill-white">
-                <path d="M12 2C9.5 5 8 7.5 8 10c0 2.2 1.8 4 4 4s4-1.8 4-4c0-.5-.1-1-.2-1.4C17.2 10 18 11.9 18 14c0 3.3-2.7 6-6 6s-6-2.7-6-6c0-4 3-8 6-10zm0 10c-.6 0-1-.4-1-1 0-.9.5-1.8 1-2.5.5.7 1 1.6 1 2.5 0 .6-.4 1-1 1z"/>
-            </svg>
-        </div>
-        <div class="text-center">
-            <h1 class="text-4xl font-bold tracking-tight">VicioApp</h1>
-            <p class="text-zinc-400 mt-1 text-lg">El Tinder de las fiestas</p>
-        </div>
-    </div>
+        {{-- Texto superior --}}
+        <p class="text-center text-zinc-400 text-sm leading-relaxed max-w-xs">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit,
+            sed do eiusmod tempor incididunt ut labore et dolore
+        </p>
 
-    {{-- Descripción --}}
-    <p class="text-center text-zinc-400 text-sm max-w-xs mb-10 leading-relaxed">
-        Escanea el QR de tu fiesta, conéctate con quienes están allí y descubre quién te gusta esta noche.
-    </p>
-
-    {{-- Botones de acción --}}
-    @auth
-        <a
-            href="{{ route('dashboard') }}"
-            class="w-full max-w-xs bg-vicio text-white font-semibold text-center py-3.5 rounded-2xl shadow-lg hover:opacity-90 transition-opacity"
-        >
-            Ir al inicio
-        </a>
-    @else
-        <div class="flex flex-col gap-3 w-full max-w-xs">
-            <a
-                href="{{ route('login') }}"
-                class="w-full bg-vicio text-white font-semibold text-center py-3.5 rounded-2xl shadow-lg hover:opacity-90 transition-opacity"
-            >
-                Iniciar sesión
-            </a>
-            @if (Route::has('register'))
-                <a
-                    href="{{ route('register') }}"
-                    class="w-full bg-zinc-800 border border-zinc-700 text-white font-semibold text-center py-3.5 rounded-2xl hover:bg-zinc-700 transition-colors"
+        {{-- Botones --}}
+        <div class="w-full max-w-sm">
+            @auth
+                
+                <a    href="{{ route('dashboard') }}"
+                    class="block w-full text-[#1a0a2e] font-bold text-2xl text-center transition-colors hover:opacity-90"
+                    style="background-color: #7B4FA6; padding: 48px 24px; border-radius: 9999px;"
                 >
-                    Crear cuenta
+                    Ir al inicio
                 </a>
-            @endif
-        </div>
-    @endauth
+            @else
+                {{-- Iniciar sesión --}}
+                
+                <a    href="{{ route('login') }}"
+                    class="block w-full text-[#1a0a2e] font-bold text-2xl text-center transition-colors hover:opacity-90 relative"
+                    style="background-color: #7B4FA6; padding: 48px 24px; border-radius: 9999px; z-index: 10;"
+                >
+                    Iniciar sesión
+                </a>
 
-    {{-- Footer --}}
-    <p class="mt-12 text-zinc-600 text-xs">© {{ date('Y') }} VicioApp. Todos los derechos reservados.</p>
+                {{-- Crear cuenta (solapado) --}}
+                @if (Route::has('register'))
+                    
+                    <a    href="{{ route('register') }}"
+                        class="block w-full text-[#1a0a2e] font-bold text-2xl text-center transition-colors hover:opacity-90 relative"
+                        style="background-color: #D4A8D4; padding: 48px 24px; border-radius: 9999px; margin-top: -20px; z-index: 0;"
+                    >
+                        Crear cuenta
+                    </a>
+                @endif
+            @endauth
+        </div>
+
+                {{-- Logo --}}
+        <div class="flex flex-col items-center gap-3">
+            <img src="{{ asset('images/logo.png') }}" alt="VicioApp" width="150" height="150">
+            <span class="text-white font-bold text-2xl tracking-tight">VicioApp</span>
+        </div>
+
+        {{-- Texto inferior --}}
+        <p class="text-center text-zinc-400 text-sm leading-relaxed max-w-xs">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit
+        </p>
+
+    </div>
 
     @fluxScripts
 </body>

@@ -8,20 +8,24 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Validator;
+use App\Support\ImageHelper;
 use Illuminate\Validation\Rules\Password;
 
 class PartyJoinController extends Controller
 {
-    /**
-     * Muestra la página de bienvenida de la fiesta al escanear el QR.
-     */
+    private function redirectIfFinished(): \Illuminate\Http\RedirectResponse
+    {
+        return auth()->check()
+            ? redirect()->route('dashboard')
+            : redirect()->route('home');
+    }
+
     public function show(string $qr)
     {
         $party = Party::where('qr_code', $qr)->firstOrFail();
 
         if ($party->status === 'finished') {
-            abort(410, 'Esta fiesta ha finalizado.');
+            return $this->redirectIfFinished();
         }
 
         if (auth()->check()) {
@@ -36,53 +40,43 @@ class PartyJoinController extends Controller
         return view('pages.party.show', compact('party'));
     }
 
-    /**
-     * Muestra el formulario de registro en la fiesta.
-     * - Si no está autenticado → formulario de creación de cuenta
-     * - Si está autenticado pero no es miembro → unirlo directamente
-     */
     public function register(string $qr)
-{
-    $party = Party::where('qr_code', $qr)->firstOrFail();
+    {
+        $party = Party::where('qr_code', $qr)->firstOrFail();
 
-    if ($party->status === 'finished') {
-        abort(410, 'Esta fiesta ha finalizado.');
-    }
+        if ($party->status === 'finished') {
+            return $this->redirectIfFinished();
+        }
 
-    // No autenticado → guardar QR en sesión y mandar al login
-    if (! auth()->check()) {
-    session([
-        'intended_party_qr' => $qr,
-        'url.intended'      => route('party.register', $qr),
-    ]);
-    return redirect()->route('login');
-}
+        if (! auth()->check()) {
+            session([
+                'intended_party_qr' => $qr,
+                'url.intended'      => route('party.register', $qr),
+            ]);
+            return redirect()->route('login');
+        }
 
-    $user = auth()->user();
-    $isMember = $user->parties()->where('party_id', $party->id)->exists();
+        $user = auth()->user();
+        $isMember = $user->parties()->where('party_id', $party->id)->exists();
 
-    if ($isMember) {
+        if ($isMember) {
+            return $this->redirectToPartyStage($party, $qr);
+        }
+
+        $user->update(['current_party_id' => $party->id]);
+        $user->parties()->syncWithoutDetaching([
+            $party->id => ['joined_at' => now()]
+        ]);
+
         return $this->redirectToPartyStage($party, $qr);
     }
 
-    // Autenticado pero no miembro → unirlo y redirigir
-    $user->update(['current_party_id' => $party->id]);
-    $user->parties()->syncWithoutDetaching([
-        $party->id => ['joined_at' => now()]
-    ]);
-
-    return $this->redirectToPartyStage($party, $qr);
-}
-
-    /**
-     * Procesa el registro de cuenta nueva + unirse a la fiesta.
-     */
     public function store(Request $request, string $qr)
     {
         $party = Party::where('qr_code', $qr)->firstOrFail();
 
         if ($party->status === 'finished') {
-            abort(410, 'Esta fiesta ha finalizado.');
+            return $this->redirectIfFinished();
         }
 
         $request->validate([
@@ -91,8 +85,8 @@ class PartyJoinController extends Controller
             'email'              => ['required', 'email', 'max:255', 'unique:users,email'],
             'password'           => ['required', 'confirmed', Password::min(8)],
             'age'                => ['required', 'integer', 'min:18', 'max:99'],
-            'gender_identity'    => ['required', 'string', 'in:man,woman,non_binary,other'],
-            'sexual_preference'  => ['required', 'string', 'in:hetero,homo,bi,pan'],
+            'gender_identity'    => ['required', 'string', 'in:man,woman'],
+            'sexual_preference'  => ['required', 'string', 'in:man,woman,both'],
             'bio'                => ['required', 'string', 'min:10', 'max:500'],
             'profile_photo'      => ['required', 'image', 'max:5120', 'mimes:jpg,jpeg,png,webp'],
         ], [
@@ -112,6 +106,8 @@ class PartyJoinController extends Controller
             'bio.min'                    => 'La bio debe tener al menos 10 caracteres.',
             'profile_photo.required'     => 'La foto de perfil es obligatoria.',
             'profile_photo.image'        => 'El archivo debe ser una imagen.',
+            'sexual_preference.in' => 'Selecciona una preferencia válida.',
+            'gender_identity.in'   => 'Selecciona una identidad válida.',
         ]);
 
         $photoPath = ImageHelper::storeAsWebP($request->file('profile_photo'));
@@ -128,7 +124,6 @@ class PartyJoinController extends Controller
             'current_party_id'   => $party->id,
         ]);
 
-        // Unir al usuario a la fiesta
         $user->parties()->syncWithoutDetaching([
             $party->id => ['joined_at' => now()]
         ]);
@@ -138,19 +133,16 @@ class PartyJoinController extends Controller
         return $this->redirectToPartyStage($party, $qr);
     }
 
-    /**
-     * Sala de espera con countdown.
-     */
     public function waiting(string $qr)
     {
         $party = Party::where('qr_code', $qr)->firstOrFail();
 
-        if ($party->status === 'active') {
-            return redirect()->route('party.swipe', $qr);
+        if ($party->status === 'finished') {
+            return $this->redirectIfFinished();
         }
 
-        if ($party->status === 'finished') {
-            abort(410, 'Esta fiesta ha finalizado.');
+        if ($party->status === 'active') {
+            return redirect()->route('party.swipe', $qr);
         }
 
         if (!auth()->user()->parties()->where('party_id', $party->id)->exists()) {
@@ -160,12 +152,13 @@ class PartyJoinController extends Controller
         return view('pages.party.waiting', compact('party'));
     }
 
-    /**
-     * Vista de swipe.
-     */
     public function swipe(string $qr)
     {
         $party = Party::where('qr_code', $qr)->firstOrFail();
+
+        if ($party->status === 'finished') {
+            return $this->redirectIfFinished();
+        }
 
         if ($party->status !== 'active') {
             return redirect()->route('party.waiting', $qr);
@@ -178,14 +171,11 @@ class PartyJoinController extends Controller
         return view('pages.party.swipe', compact('party'));
     }
 
-    /**
-     * Redirige al usuario al estado correcto de la fiesta.
-     */
     private function redirectToPartyStage(Party $party, string $qr)
     {
         return match(true) {
             $party->status === 'active'   => redirect()->route('party.swipe', $qr),
-            $party->status === 'finished' => abort(410, 'Esta fiesta ha finalizado.'),
+            $party->status === 'finished' => $this->redirectIfFinished(),
             default                       => redirect()->route('party.waiting', $qr),
         };
     }

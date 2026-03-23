@@ -29,6 +29,9 @@ Route::prefix('party')->name('party.')->group(function () {
     Route::get('{qr}/swipe', [\App\Http\Controllers\Party\PartyJoinController::class, 'swipe'])
         ->middleware('auth')
         ->name('swipe');
+
+    Route::get('{qr}/finished', [\App\Http\Controllers\Party\PartyJoinController::class, 'finished'])
+    ->name('finished');
         
     Route::post('{qr}/login', [\App\Http\Controllers\Party\PartyJoinController::class, 'login'])
     ->name('login');
@@ -99,3 +102,4 @@ Route::middleware(['auth', \App\Http\Middleware\IsAdmin::class])
         Route::patch('users/{user}/toggle-admin', [\App\Http\Controllers\Admin\AdminUserController::class, 'toggleAdmin'])
             ->name('users.toggle-admin');
     });
+

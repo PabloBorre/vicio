@@ -39,7 +39,7 @@ class PartyWaiting extends Component
         }
 
         if ($this->party->status === 'finished') {
-            $this->redirect(route('party.show', $this->party->qr_code), navigate: true);
+            $this->redirect(route('party.finished', $this->party->qr_code), navigate: true);
         }
     }
 

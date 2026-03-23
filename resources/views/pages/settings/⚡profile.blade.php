@@ -41,7 +41,7 @@ new #[Title('Ajustes de perfil')] class extends Component {
             'email'             => ['required', 'email', 'max:255', 'unique:users,email,' . $user->id],
             'bio'               => ['nullable', 'string', 'max:500'],
             'age'               => ['required', 'integer', 'min:18', 'max:99'],
-            'sexual_preference' => ['required', 'in:hetero,homo,bi'],
+            'sexual_preference' => ['required', 'in:man,woman,both'],
             'photo'             => ['nullable', 'image', 'max:5120', 'mimes:jpg,jpeg,png,webp'],
         ], [
             'username.unique' => 'Este nombre de usuario ya está en uso.',
@@ -133,29 +133,29 @@ $validated['profile_photo_path'] = ImageHelper::storeAsWebP($this->photo);      
             <div class="space-y-2">
                 <label class="text-sm font-medium text-zinc-300">Me gustan</label>
                 <div class="grid grid-cols-3 gap-3">
-                    <button type="button" wire:click="$set('sexual_preference', 'hetero')"
+                    <button type="button" wire:click="$set('sexual_preference', 'man')"
                         @class([
                             'flex flex-col items-center gap-1.5 py-4 rounded-2xl text-sm font-semibold border-2 transition-all duration-200',
-                            'bg-vicio-600 text-white border-vicio-500'                                        => $sexual_preference === 'hetero',
-                            'bg-zinc-900 text-zinc-400 border-zinc-700 hover:border-zinc-500 hover:text-zinc-300' => $sexual_preference !== 'hetero',
+                            'bg-vicio-600 text-white border-vicio-500'                                        => $sexual_preference === 'man',
+                            'bg-zinc-900 text-zinc-400 border-zinc-700 hover:border-zinc-500 hover:text-zinc-300' => $sexual_preference !== 'man',
                         ])>
                         <span class="text-2xl">👨</span>
                         <span class="text-xs text-center leading-tight">Hombres</span>
                     </button>
-                    <button type="button" wire:click="$set('sexual_preference', 'homo')"
+                    <button type="button" wire:click="$set('sexual_preference', 'woman')"
                         @class([
                             'flex flex-col items-center gap-1.5 py-4 rounded-2xl text-sm font-semibold border-2 transition-all duration-200',
-                            'bg-vicio-600 text-white border-vicio-500'                                        => $sexual_preference === 'homo',
-                            'bg-zinc-900 text-zinc-400 border-zinc-700 hover:border-zinc-500 hover:text-zinc-300' => $sexual_preference !== 'homo',
+                            'bg-vicio-600 text-white border-vicio-500'                                        => $sexual_preference === 'woman',
+                            'bg-zinc-900 text-zinc-400 border-zinc-700 hover:border-zinc-500 hover:text-zinc-300' => $sexual_preference !== 'woman',
                         ])>
                         <span class="text-2xl">👩</span>
                         <span class="text-xs text-center leading-tight">Mujeres</span>
                     </button>
-                    <button type="button" wire:click="$set('sexual_preference', 'bi')"
+                    <button type="button" wire:click="$set('sexual_preference', 'both')"
                         @class([
                             'flex flex-col items-center gap-1.5 py-4 rounded-2xl text-sm font-semibold border-2 transition-all duration-200',
-                            'bg-vicio-600 text-white border-vicio-500'                                        => $sexual_preference === 'bi',
-                            'bg-zinc-900 text-zinc-400 border-zinc-700 hover:border-zinc-500 hover:text-zinc-300' => $sexual_preference !== 'bi',
+                            'bg-vicio-600 text-white border-vicio-500'                                        => $sexual_preference === 'both',
+                            'bg-zinc-900 text-zinc-400 border-zinc-700 hover:border-zinc-500 hover:text-zinc-300' => $sexual_preference !== 'both',
                         ])>
                         <span class="text-2xl">💞</span>
                         <span class="text-xs text-center leading-tight">Ambos</span>

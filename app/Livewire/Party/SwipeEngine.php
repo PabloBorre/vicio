@@ -63,29 +63,29 @@ class SwipeEngine extends Component
     }
 
     private function applyPreferenceFilter($query, User $me)
-    {
-        $myPref   = $me->sexual_preference ?? 'bi';
-        $myGender = $me->gender_identity   ?? 'man';
-        $opposite = $myGender === 'man' ? 'woman' : 'man';
+{
+    $myPref   = $me->sexual_preference ?? 'both';
+    $myGender = $me->gender_identity   ?? 'man';
+    $opposite = $myGender === 'man' ? 'woman' : 'man';
 
-        return $query->where(function ($q) use ($myPref, $myGender, $opposite) {
-            if ($myPref === 'hetero') {
-                $q->where('gender_identity', $opposite)
-                  ->whereIn('sexual_preference', ['hetero', 'bi']);
-            } elseif ($myPref === 'homo') {
-                $q->where('gender_identity', $myGender)
-                  ->whereIn('sexual_preference', ['homo', 'bi']);
-            } elseif ($myPref === 'bi') {
-                $q->where(function ($sub) use ($myGender) {
-                    $sub->where('gender_identity', $myGender)
-                        ->whereIn('sexual_preference', ['homo', 'bi']);
-                })->orWhere(function ($sub) use ($opposite) {
-                    $sub->where('gender_identity', $opposite)
-                        ->whereIn('sexual_preference', ['hetero', 'bi']);
-                });
-            }
-        });
-    }
+    return $query->where(function ($q) use ($myPref, $myGender, $opposite) {
+        if ($myPref === 'man') {
+            $q->where('gender_identity', 'man')
+              ->whereIn('sexual_preference', ['man', 'both']);
+        } elseif ($myPref === 'woman') {
+            $q->where('gender_identity', 'woman')
+              ->whereIn('sexual_preference', ['woman', 'both']);
+        } elseif ($myPref === 'both') {
+            $q->where(function ($sub) use ($myGender) {
+                $sub->where('gender_identity', $myGender)
+                    ->whereIn('sexual_preference', [$myGender, 'both']);
+            })->orWhere(function ($sub) use ($opposite) {
+                $sub->where('gender_identity', $opposite)
+                    ->whereIn('sexual_preference', [$opposite, 'both']);
+            });
+        }
+    });
+}
 
     /**
      * Avanza la cola: current ← next ← pendingIds.shift()
@@ -188,5 +188,13 @@ class SwipeEngine extends Component
     public function render()
     {
         return view('livewire.party.swipe-engine');
+    }
+
+    public function checkIfFinished(): void
+    {
+        $this->party->refresh();
+        if ($this->party->status === 'finished') {
+            $this->redirect(route('party.finished', $this->party->qr_code), navigate: true);
+        }
     }
 }   

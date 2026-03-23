@@ -56,7 +56,7 @@ class AdminUserController extends Controller
             'email'              => ['nullable', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
             'age'                => ['nullable', 'integer', 'min:18', 'max:99'],
             'gender_identity'    => ['nullable', 'in:man,woman'],
-            'sexual_preference'  => ['nullable', 'in:man,woman,bi'],
+            'sexual_preference'  => ['nullable', 'in:man,woman,both'],
             'bio'                => ['nullable', 'string', 'max:500'],
             'is_admin'           => ['boolean'],
             'is_banned'          => ['boolean'],

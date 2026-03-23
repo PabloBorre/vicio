@@ -71,7 +71,7 @@ new #[Title('Inicio')] class extends Component
 
 {{-- Fiesta activa si existe (solo usuarios normales) --}}
         @if(!auth()->user()->is_admin)
-            @if($currentParty = auth()->user()->currentParty)
+            @if($currentParty = auth()->user()->currentParty?->status !== 'finished' ? auth()->user()->currentParty : null)
                 <div class="w-full max-w-sm bg-vicio-900/30 border border-vicio-700/50 rounded-2xl p-4 flex items-center gap-4">
                     <div class="size-10 rounded-full vicio-gradient flex items-center justify-center shrink-0">
                         <svg xmlns="http://www.w3.org/2000/svg" class="size-5 fill-white" viewBox="0 0 24 24">

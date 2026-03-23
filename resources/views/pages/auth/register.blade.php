@@ -137,10 +137,6 @@
                         style="width:130px; height:130px; border-radius:9999px; background-color:#C8A8DC; color:#2D0A4E; font-weight:600; font-size:14px; position:relative; z-index:2; border:none; cursor:pointer;">
                         Mujer
                     </button>
-                    <button type="button" data-group="gender_identity" data-value="other" onclick="selectOption(this)"
-                        style="width:130px; height:130px; border-radius:9999px; background-color:#DCC8EC; color:#2D0A4E; font-weight:600; font-size:14px; margin-left:-30px; position:relative; z-index:1; border:none; cursor:pointer;">
-                        Otro
-                    </button>
                 </div>
                 <input type="hidden" name="gender_identity" id="gender_identity" value="{{ old('gender_identity') }}" required/>
                 @error('gender_identity')
@@ -156,11 +152,11 @@
                         style="width:130px; height:130px; border-radius:9999px; background-color:#B090C8; color:#2D0A4E; font-weight:600; font-size:14px; margin-right:-30px; position:relative; z-index:1; border:none; cursor:pointer;">
                         Hombres
                     </button>
-                    <button type="button" data-group="sexual_preference" data-value="woman" onclick="selectOption(this)"
+                    <button type="button" data-group="sexual_preference" data-value="woman" onclick="selectOption(this)" 
                         style="width:130px; height:130px; border-radius:9999px; background-color:#C8A8DC; color:#2D0A4E; font-weight:600; font-size:14px; position:relative; z-index:2; border:none; cursor:pointer;">
                         Mujeres
                     </button>
-                    <button type="button" data-group="sexual_preference" data-value="bi" onclick="selectOption(this)"
+                    <button type="button" data-group="sexual_preference" data-value="both" onclick="selectOption(this)"
                         style="width:130px; height:130px; border-radius:9999px; background-color:#DCC8EC; color:#2D0A4E; font-weight:600; font-size:14px; margin-left:-30px; position:relative; z-index:1; border:none; cursor:pointer;">
                         Ambos
                     </button>

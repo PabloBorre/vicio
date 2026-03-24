@@ -227,58 +227,60 @@ new #[Title('Editar perfil')] class extends Component {
 </div>
         @error('sexual_preference') <p class="text-red-200 text-xs text-center mt-1 px-4">{{ $message }}</p> @enderror
 
-        {{-- CONTRASEÑA --}}
-        <p class="text-white/70 text-sm text-center" style="padding-top: 8px;">Cambiar contraseña</p>
+{{-- CONTRASEÑA --}}
+<p class="text-white/70 text-sm text-center" style="padding-top: 8px;">Cambiar contraseña</p>
 
-        <div x-data="{ show1: false, show2: false, show3: false }" class="space-y-3">
-            <div>
-                <div class="relative">
-                    <input :type="show1 ? 'text' : 'password'" wire:model="current_password"
-                        placeholder="Contraseña actual"
-                        class="w-full text-white text-center font-medium placeholder-white/60 border-0 focus:outline-none focus:ring-2 focus:ring-white/30 pr-12"
-                        style="background-color: #2D0A4E; font-size: 16px; padding: 18px 24px; border-radius: 9999px;"/>
-                    <button type="button" @click="show1 = !show1"
-                        class="absolute right-5 top-1/2 -translate-y-1/2 text-white/50 hover:text-white/80">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" x-show="!show1" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" x-show="show1" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 4.411m0 0L21 21"/>
-                        </svg>
-                    </button>
-                </div>
-                @error('current_password') <p class="text-red-200 text-xs text-center mt-1 px-4">{{ $message }}</p> @enderror
-            </div>
-            <div>
-                <div class="relative">
-                    <input :type="show2 ? 'text' : 'password'" wire:model="password"
-                        placeholder="Nueva contraseña"
-                        class="w-full text-white text-center font-medium placeholder-white/60 border-0 focus:outline-none focus:ring-2 focus:ring-white/30 pr-12"
-                        style="background-color: #2D0A4E; font-size: 16px; padding: 18px 24px; border-radius: 9999px;"/>
-                    <button type="button" @click="show2 = !show2"
-                        class="absolute right-5 top-1/2 -translate-y-1/2 text-white/50 hover:text-white/80">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" x-show="!show2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" x-show="show2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 4.411m0 0L21 21"/>
-                        </svg>
-                    </button>
-                </div>
-                @error('password') <p class="text-red-200 text-xs text-center mt-1 px-4">{{ $message }}</p> @enderror
-            </div>
-            <div>
-                <div class="relative">
-                    <input :type="show3 ? 'text' : 'password'" wire:model="password_confirmation"
-                        placeholder="Repite la nueva contraseña"
-                        class="w-full text-white text-center font-medium placeholder-white/60 border-0 focus:outline-none focus:ring-2 focus:ring-white/30 pr-12"
-                        style="background-color: #2D0A4E; font-size: 16px; padding: 18px 24px; border-radius: 9999px;"/>
-                    <button type="button" @click="show3 = !show3"
-                        class="absolute right-5 top-1/2 -translate-y-1/2 text-white/50 hover:text-white/80">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" x-show="!show3" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" x-show="show3" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 4.411m0 0L21 21"/>
-                        </svg>
-                    </button>
-                </div>
-            </div>
+<div x-data="{ show1: false, show2: false, show3: false }" class="space-y-3">
+    <div>
+        <div class="relative">
+            <input :type="show1 ? 'text' : 'password'" wire:model="current_password"
+                placeholder="Contraseña actual"
+                class="w-full text-white text-center font-medium placeholder-white/60 border-0 focus:outline-none focus:ring-2 focus:ring-white/30"
+                style="background-color: #2D0A4E; font-size: 16px; padding: 18px 50px 18px 24px; border-radius: 9999px; display: block; width: 100%; box-sizing: border-box;"/>
+            <button type="button" @click="show1 = !show1"
+                style="position: absolute; right: 18px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; padding: 0; color: rgba(255,255,255,0.5);">
+                <svg xmlns="http://www.w3.org/2000/svg" style="width:22px; height:22px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                </svg>
+            </button>
         </div>
+        @error('current_password') <p class="text-red-200 text-xs text-center mt-1 px-4">{{ $message }}</p> @enderror
+    </div>
+
+    <div>
+        <div class="relative">
+            <input :type="show2 ? 'text' : 'password'" wire:model="password"
+                placeholder="Nueva contraseña"
+                class="w-full text-white text-center font-medium placeholder-white/60 border-0 focus:outline-none focus:ring-2 focus:ring-white/30"
+                style="background-color: #2D0A4E; font-size: 16px; padding: 18px 50px 18px 24px; border-radius: 9999px; display: block; width: 100%; box-sizing: border-box;"/>
+            <button type="button" @click="show2 = !show2"
+                style="position: absolute; right: 18px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; padding: 0; color: rgba(255,255,255,0.5);">
+                <svg xmlns="http://www.w3.org/2000/svg" style="width:22px; height:22px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                </svg>
+            </button>
+        </div>
+        @error('password') <p class="text-red-200 text-xs text-center mt-1 px-4">{{ $message }}</p> @enderror
+    </div>
+
+    <div>
+        <div class="relative">
+            <input :type="show3 ? 'text' : 'password'" wire:model="password_confirmation"
+                placeholder="Confirmar contraseña"
+                class="w-full text-white text-center font-medium placeholder-white/60 border-0 focus:outline-none focus:ring-2 focus:ring-white/30"
+                style="background-color: #2D0A4E; font-size: 16px; padding: 18px 50px 18px 24px; border-radius: 9999px; display: block; width: 100%; box-sizing: border-box;"/>
+            <button type="button" @click="show3 = !show3"
+                style="position: absolute; right: 18px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; padding: 0; color: rgba(255,255,255,0.5);">
+                <svg xmlns="http://www.w3.org/2000/svg" style="width:22px; height:22px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+</div>
 
         {{-- BOTÓN --}}
         <div style="padding-top: 16px;">

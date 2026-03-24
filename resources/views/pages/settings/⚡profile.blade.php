@@ -36,70 +36,72 @@ new #[Title('Editar perfil')] class extends Component {
     }
 
     public function updateProfile(): void
-    {
-        $user = Auth::user();
+{
+    $user = Auth::user();
 
-        $validated = $this->validate([
-            'name'              => ['required', 'string', 'max:255'],
-            'username'          => ['required', 'string', 'min:3', 'max:30', 'unique:users,username,' . $user->id, 'regex:/^[a-zA-Z0-9_]+$/'],
-            'email'             => ['required', 'email', 'max:255', 'unique:users,email,' . $user->id],
-            'bio'               => ['nullable', 'string', 'max:500'],
-            'age'               => ['required', 'integer', 'min:18', 'max:99'],
-            'sexual_preference' => ['required', 'in:man,woman,both'],
-            'photo'             => ['nullable', 'image', 'max:5120', 'mimes:jpg,jpeg,png,webp'],
+    // Si el usuario intenta cambiar la contraseña, verificar la actual PRIMERO
+    // antes de cualquier otra validación, para dar feedback inmediato
+    if ($this->current_password || $this->password || $this->password_confirmation) {
+        if (!Hash::check($this->current_password, $user->password)) {
+            $this->addError('current_password', 'La contraseña actual no es correcta.');
+            return;
+        }
+
+        $this->validate([
+            'current_password'      => ['required'],
+            'password'              => ['required', 'string', 'min:8', 'confirmed'],
+            'password_confirmation' => ['required'],
         ], [
-            'username.unique' => 'Este nombre de usuario ya está en uso.',
-            'username.regex'  => 'Solo letras, números y guiones bajos.',
-            'email.unique'    => 'Este email ya está registrado.',
-            'age.min'         => 'Debes tener al menos 18 años.',
+            'current_password.required' => 'Introduce tu contraseña actual.',
+            'password.min'              => 'La nueva contraseña debe tener al menos 8 caracteres.',
+            'password.confirmed'        => 'Las contraseñas no coinciden.',
         ]);
-
-        // Contraseña (opcional)
-        if ($this->current_password || $this->password) {
-            $this->validate([
-                'current_password'      => ['required'],
-                'password'              => ['required', 'min:8', 'confirmed'],
-                'password_confirmation' => ['required'],
-            ], [
-                'current_password.required' => 'Introduce tu contraseña actual.',
-                'password.min'              => 'La nueva contraseña debe tener al menos 8 caracteres.',
-                'password.confirmed'        => 'Las contraseñas no coinciden.',
-            ]);
-
-            if (!Hash::check($this->current_password, $user->password)) {
-                throw ValidationException::withMessages([
-                    'current_password' => 'La contraseña actual no es correcta.',
-                ]);
-            }
-
-            $user->password = Hash::make($this->password);
-        }
-
-        if ($this->photo) {
-            if ($user->profile_photo_path) {
-                Storage::disk('public')->delete($user->profile_photo_path);
-            }
-            $validated['profile_photo_path'] = ImageHelper::storeAsWebP($this->photo);
-        }
-
-        unset($validated['photo']);
-
-        if (isset($validated['email']) && $validated['email'] !== $user->email) {
-            $user->email_verified_at = null;
-        }
-
-        $user->fill($validated);
-        $user->save();
-
-        $this->photo = null;
-        $this->current_password = '';
-        $this->password = '';
-        $this->password_confirmation = '';
-
-        // Elimina el dispatch y añade redirect
-        session()->flash('profile-updated', true);
-        $this->redirect(route('profile.edit'), navigate: false);
     }
+
+    $validated = $this->validate([
+        'name'              => ['required', 'string', 'max:255'],
+        'username'          => ['required', 'string', 'min:3', 'max:30', 'unique:users,username,' . $user->id, 'regex:/^[a-zA-Z0-9_]+$/'],
+        'email'             => ['required', 'email', 'max:255', 'unique:users,email,' . $user->id],
+        'bio'               => ['nullable', 'string', 'max:500'],
+        'age'               => ['required', 'integer', 'min:18', 'max:99'],
+        'sexual_preference' => ['required', 'in:man,woman,both'],
+        'photo'             => ['nullable', 'image', 'max:5120', 'mimes:jpg,jpeg,png,webp'],
+    ], [
+        'username.unique' => 'Este nombre de usuario ya está en uso.',
+        'username.regex'  => 'Solo letras, números y guiones bajos.',
+        'email.unique'    => 'Este email ya está registrado.',
+        'age.min'         => 'Debes tener al menos 18 años.',
+    ]);
+
+    // Actualizar contraseña si se proporcionó (ya validada arriba)
+    if ($this->password) {
+        $user->password = Hash::make($this->password);
+    }
+
+    if ($this->photo) {
+        if ($user->profile_photo_path) {
+            Storage::disk('public')->delete($user->profile_photo_path);
+        }
+        $validated['profile_photo_path'] = ImageHelper::storeAsWebP($this->photo);
+    }
+
+    unset($validated['photo']);
+
+    if (isset($validated['email']) && $validated['email'] !== $user->email) {
+        $user->email_verified_at = null;
+    }
+
+    $user->fill($validated);
+    $user->save();
+
+    $this->photo = null;
+    $this->current_password = '';
+    $this->password = '';
+    $this->password_confirmation = '';
+
+    session()->flash('profile-updated', true);
+    $this->redirect(route('profile.edit'), navigate: false);
+}
 }; ?>
 
 <!DOCTYPE html>

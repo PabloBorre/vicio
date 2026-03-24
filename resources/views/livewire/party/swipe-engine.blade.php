@@ -113,10 +113,10 @@
             <span class="text-white font-bold text-2xl tracking-tight">VicioApp</span>
         </div>
 
-        {{-- Botón menú (derecha) --}}
-        <div class="relative">
+        {{-- Botón menú (derecha) — scope Alpine propio para evitar conflicto con drag --}}
+        <div class="relative" x-data="{ open: false }">
             <button
-                @click.stop="showMenu = !showMenu"
+                @click.stop="open = !open"
                 class="size-11 rounded-full bg-white flex items-center justify-center hover:bg-white/90 transition-colors"
             >
                 <svg xmlns="http://www.w3.org/2000/svg" class="size-5" fill="none" viewBox="0 0 24 24" stroke="#49197C">
@@ -124,46 +124,48 @@
                 </svg>
             </button>
 
+            {{-- Overlay oscuro --}}
+            <div
+                x-show="open"
+                @click="open = false"
+                class="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm"
+                style="display: none;"
+            ></div>
+
             {{-- Dropdown --}}
             <div
-                x-show="showMenu"
+                x-show="open"
                 x-transition:enter="transition ease-out duration-150"
                 x-transition:enter-start="opacity-0 scale-95 -translate-y-2"
                 x-transition:enter-end="opacity-100 scale-100 translate-y-0"
                 x-transition:leave="transition ease-in duration-100"
                 x-transition:leave-start="opacity-100 scale-100 translate-y-0"
                 x-transition:leave-end="opacity-0 scale-95 -translate-y-2"
-                @click.outside="showMenu = false"
                 class="absolute right-0 top-14 z-50 flex flex-col gap-2 min-w-[200px]"
                 style="display: none;"
             >
-                <a
-                    href="{{ route('dashboard') }}"
+                
+                <a    href="{{ route('dashboard') }}"
                     wire:navigate
                     class="w-full text-center px-6 py-4 rounded-2xl font-semibold text-lg whitespace-nowrap shadow-lg transition-colors"
                     style="background: #f5f0eb; color: #49197C;"
                 >
                     Mi perfil
                 </a>
-                <a
-                    href="{{ route('dashboard') }}"
-                    wire:navigate
-                    class="w-full text-center px-6 py-4 rounded-2xl font-semibold text-lg whitespace-nowrap shadow-lg transition-colors"
-                    style="background: #f5f0eb; color: #49197C;"
-                >
-                    Salir ✕
-                </a>
+                
+                <form method="POST" action="{{ route('logout') }}" class="w-full">
+                    @csrf
+                    <button
+                        type="submit"
+                        class="w-full text-center px-6 py-4 rounded-2xl font-semibold text-lg whitespace-nowrap shadow-lg transition-colors"
+                        style="background: #f5f0eb; color: #49197C;"
+                    >
+                        Salir ✕
+                    </button>
+                </form>
             </div>
         </div>
-    </div>
-
-    {{-- Overlay transparente cuando el menú está abierto --}}
-    <div
-        x-show="showMenu"
-        @click="showMenu = false"
-        class="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm"
-        style="display: none;"
-    ></div>
+    </div>  
 
     {{-- ── ZONA DE TARJETA ── --}}
     <div class="relative flex-1 flex items-stretch px-3 pt-3 pb-3 min-h-0">
@@ -216,14 +218,32 @@
                     <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/10 to-transparent"></div>
 
                     {{-- Badge LIKE --}}
-                    <div class="absolute top-8 left-6 border-4 border-green-400 rounded-xl px-4 py-2 -rotate-12 transition-opacity duration-150"
-                         :class="showLike ? 'opacity-100' : 'opacity-0'">
+                    <div
+                        x-show="showLike"
+                        x-transition:enter="transition ease-out duration-100"
+                        x-transition:enter-start="opacity-0"
+                        x-transition:enter-end="opacity-100"
+                        x-transition:leave="transition ease-in duration-100"
+                        x-transition:leave-start="opacity-100"
+                        x-transition:leave-end="opacity-0"
+                        class="absolute top-8 left-6 border-4 border-green-400 rounded-xl px-4 py-2 rotate-[-15deg]"
+                        style="display:none;"
+                    >
                         <span class="text-green-400 font-black text-2xl tracking-widest">LIKE</span>
                     </div>
 
                     {{-- Badge NOPE --}}
-                    <div class="absolute top-8 right-6 border-4 border-red-400 rounded-xl px-4 py-2 rotate-12 transition-opacity duration-150"
-                         :class="showNope ? 'opacity-100' : 'opacity-0'">
+                    <div
+                        x-show="showNope"
+                        x-transition:enter="transition ease-out duration-100"
+                        x-transition:enter-start="opacity-0"
+                        x-transition:enter-end="opacity-100"
+                        x-transition:leave="transition ease-in duration-100"
+                        x-transition:leave-start="opacity-100"
+                        x-transition:leave-end="opacity-0"
+                        class="absolute top-8 right-6 border-4 border-red-400 rounded-xl px-4 py-2 rotate-[15deg]"
+                        style="display:none;"
+                    >
                         <span class="text-red-400 font-black text-2xl tracking-widest">NOPE</span>
                     </div>
 

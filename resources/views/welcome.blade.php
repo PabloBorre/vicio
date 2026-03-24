@@ -47,7 +47,7 @@
 
                 {{-- Logo --}}
         <div class="flex flex-col items-center gap-3">
-            <img src="{{ asset('images/logo.png') }}" alt="VicioApp" width="150" height="150">
+            <img src="{{ asset('images/Logo.png') }}" alt="VicioApp" width="150" height="150">
             <span class="text-white font-bold text-2xl tracking-tight">VicioApp</span>
         </div>
 

@@ -66,24 +66,22 @@ class SwipeEngine extends Component
 {
     $myPref   = $me->sexual_preference ?? 'both';
     $myGender = $me->gender_identity   ?? 'man';
-    $opposite = $myGender === 'man' ? 'woman' : 'man';
 
-    return $query->where(function ($q) use ($myPref, $myGender, $opposite) {
+    return $query->where(function ($q) use ($myPref, $myGender) {
+
+        // 1. Filtrar por el género que me gusta a mí
         if ($myPref === 'man') {
-            $q->where('gender_identity', 'man')
-              ->whereIn('sexual_preference', ['man', 'both']);
+            $q->where('gender_identity', 'man');
         } elseif ($myPref === 'woman') {
-            $q->where('gender_identity', 'woman')
-              ->whereIn('sexual_preference', ['woman', 'both']);
-        } elseif ($myPref === 'both') {
-            $q->where(function ($sub) use ($myGender) {
-                $sub->where('gender_identity', $myGender)
-                    ->whereIn('sexual_preference', [$myGender, 'both']);
-            })->orWhere(function ($sub) use ($opposite) {
-                $sub->where('gender_identity', $opposite)
-                    ->whereIn('sexual_preference', [$opposite, 'both']);
-            });
+            $q->where('gender_identity', 'woman');
         }
+        // both → no filtrar por gender_identity del candidato
+
+        // 2. El candidato debe estar interesado en mi género (o en ambos)
+        $q->where(function ($sub) use ($myGender) {
+            $sub->where('sexual_preference', $myGender)
+                ->orWhere('sexual_preference', 'both');
+        });
     });
 }
 

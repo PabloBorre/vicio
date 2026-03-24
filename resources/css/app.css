@@ -148,3 +148,18 @@ select:focus[data-flux-control] {
 .swipe-card {
     box-shadow: 0 20px 60px rgba(73, 25, 124, 0.4);
 }
+
+/* ── Mobile frame — max-width móvil centrado ── */
+body {
+    display: flex;
+    justify-content: center;
+    min-height: 100dvh;
+    background-color: #5C2090;
+}
+
+body > * {
+    width: 100%;
+    max-width: 430px;
+    position: relative;
+}
+

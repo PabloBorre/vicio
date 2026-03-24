@@ -1,5 +1,6 @@
 <div
-    class="relative min-h-screen bg-zinc-950 flex flex-col items-center justify-between px-4 pt-6 pb-8 overflow-hidden select-none"
+    class="relative flex flex-col select-none overflow-hidden"
+    style="height: 100dvh; background-color: #470D4E;"
     x-data="{
         dragging: false,
         startX: 0,
@@ -12,6 +13,7 @@
         showNope: false,
         threshold: 80,
         showMatch: @entangle('lastMatch').live,
+        showMenu: false,
 
         get cardStyle() {
             return `transform: translate(${this.currentX}px, ${this.currentY}px) rotate(${this.rotation}deg); opacity: ${this.opacity}; transition: ${this.dragging ? 'none' : 'transform 0.3s, opacity 0.3s'}`;
@@ -94,25 +96,81 @@
 >
 
     {{-- ── HEADER ── --}}
-    <div class="w-full max-w-sm flex items-center justify-between mb-2">
-        <div>
-            <h1 class="text-white font-bold text-lg">{{ $party->name }}</h1>
-            <p class="text-zinc-500 text-xs">Desliza para conectar</p>
-        </div>
-        <a href="{{ route('dashboard') }}" wire:navigate
-           class="size-9 rounded-full bg-zinc-800 flex items-center justify-center hover:bg-zinc-700 transition-colors">
-            <svg xmlns="http://www.w3.org/2000/svg" class="size-4 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+    <div class="relative z-50 shrink-0 flex items-center justify-between px-4 py-3" style="background-color: #470D4E;">
+
+        {{-- Botón chat (izquierda) --}}
+        <a href="{{ route('chats.index') }}" wire:navigate
+           class="size-11 rounded-full bg-white/20 flex items-center justify-center hover:bg-white/30 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="size-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-3 3v-3z"/>
             </svg>
         </a>
+
+        {{-- Logo centro --}}
+        <div class="flex items-center gap-2">
+            <img src="{{ asset('images/Logo.png') }}" alt="VicioApp" width="48" height="48">
+            <span class="text-white font-bold text-2xl tracking-tight">VicioApp</span>
+        </div>
+
+        {{-- Botón menú (derecha) --}}
+        <div class="relative">
+            <button
+                @click.stop="showMenu = !showMenu"
+                class="size-11 rounded-full bg-white flex items-center justify-center hover:bg-white/90 transition-colors"
+            >
+                <svg xmlns="http://www.w3.org/2000/svg" class="size-5" fill="none" viewBox="0 0 24 24" stroke="#49197C">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 12h16M4 18h16"/>
+                </svg>
+            </button>
+
+            {{-- Dropdown --}}
+            <div
+                x-show="showMenu"
+                x-transition:enter="transition ease-out duration-150"
+                x-transition:enter-start="opacity-0 scale-95 -translate-y-2"
+                x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                x-transition:leave="transition ease-in duration-100"
+                x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                x-transition:leave-end="opacity-0 scale-95 -translate-y-2"
+                @click.outside="showMenu = false"
+                class="absolute right-0 top-14 z-50 flex flex-col gap-2 min-w-[200px]"
+                style="display: none;"
+            >
+                <a
+                    href="{{ route('profile.edit') }}"
+                    wire:navigate
+                    class="w-full text-center px-6 py-4 rounded-2xl font-semibold text-lg whitespace-nowrap shadow-lg transition-colors"
+                    style="background: #f5f0eb; color: #49197C;"
+                >
+                    Editar perfil
+                </a>
+                <a
+                    href="{{ route('dashboard') }}"
+                    wire:navigate
+                    class="w-full text-center px-6 py-4 rounded-2xl font-semibold text-lg whitespace-nowrap shadow-lg transition-colors"
+                    style="background: #f5f0eb; color: #49197C;"
+                >
+                    Salir ✕
+                </a>
+            </div>
+        </div>
     </div>
 
-    {{-- ── ZONA DE TARJETAS ── --}}
-    <div class="relative w-full max-w-sm flex-1 flex items-center justify-center">
+    {{-- Overlay transparente cuando el menú está abierto --}}
+    <div
+        x-show="showMenu"
+        @click="showMenu = false"
+        class="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm"
+        style="display: none;"
+    ></div>
+
+    {{-- ── ZONA DE TARJETA ── --}}
+    <div class="relative flex-1 flex items-stretch px-3 pt-3 pb-3 min-h-0">
 
         @if($noMoreCards)
             {{-- Sin más perfiles --}}
-            <div class="flex flex-col items-center gap-5 text-center py-16 px-6">
+            <div class="flex flex-col items-center justify-center w-full gap-5 text-center px-6">
                 <div class="size-24 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center">
                     <span class="text-5xl">👀</span>
                 </div>
@@ -123,7 +181,8 @@
                         <span class="text-zinc-600">Vuelve a comprobarlo en unos minutos.</span>
                     </p>
                 </div>
-                <button wire:click="reload" class="mt-2 px-6 py-2.5 rounded-xl bg-zinc-800 text-zinc-300 text-sm font-medium hover:bg-zinc-700 transition-colors">
+                <button wire:click="reload"
+                        class="mt-2 px-6 py-2.5 rounded-xl bg-zinc-800 text-zinc-300 text-sm font-medium hover:bg-zinc-700 transition-colors">
                     🔄 Actualizar
                 </button>
             </div>
@@ -132,11 +191,9 @@
 
             {{-- Tarjeta de fondo (siguiente) --}}
             @if($nextCard)
-                <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
-                    <div class="w-full h-[480px] rounded-3xl overflow-hidden bg-zinc-900 border border-zinc-800 scale-95 opacity-60">
-                        <div class="w-full h-full bg-cover bg-center"
-                             style="background-image: url('{{ $nextCard['profile_photo_url'] }}')">
-                        </div>
+                <div class="absolute inset-3 rounded-3xl overflow-hidden pointer-events-none scale-95 opacity-60">
+                    <div class="w-full h-full bg-cover bg-center bg-zinc-800"
+                         style="background-image: url('{{ $nextCard['profile_photo_url'] }}')">
                     </div>
                 </div>
             @endif
@@ -144,7 +201,7 @@
             {{-- Tarjeta principal --}}
             @if($currentCard)
                 <div
-                    class="relative w-full h-[480px] rounded-3xl overflow-hidden cursor-grab active:cursor-grabbing"
+                    class="relative w-full rounded-3xl overflow-hidden cursor-grab active:cursor-grabbing"
                     :style="cardStyle"
                     @mousedown="startDrag($event)"
                     @touchstart="startDrag($event)"
@@ -156,7 +213,7 @@
                     </div>
 
                     {{-- Gradiente overlay --}}
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/95 via-black/30 to-transparent"></div>
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/10 to-transparent"></div>
 
                     {{-- Badge LIKE --}}
                     <div class="absolute top-8 left-6 border-4 border-green-400 rounded-xl px-4 py-2 -rotate-12 transition-opacity duration-150"
@@ -170,16 +227,16 @@
                         <span class="text-red-400 font-black text-2xl tracking-widest">NOPE</span>
                     </div>
 
-                    {{-- Info del usuario --}}
-                    <div class="absolute bottom-0 left-0 right-0 p-5">
-                        <h2 class="text-white font-bold text-2xl leading-tight">
+                    {{-- Info usuario (abajo de la tarjeta) --}}
+                    <div class="absolute bottom-0 left-0 right-0 px-6 pb-6 pt-16">
+                        <h2 class="text-white font-bold text-3xl leading-tight drop-shadow">
                             {{ $currentCard['username'] }}
                             @if($currentCard['age'])
-                                <span class="font-light text-white/80">, {{ $currentCard['age'] }}</span>
+                                <span class="font-light text-white/90"> {{ $currentCard['age'] }}</span>
                             @endif
                         </h2>
-                        @if(!empty($currentCard['bio']))
-                            <p class="text-white/70 text-sm mt-1.5 leading-snug line-clamp-2">
+                        @if($currentCard['bio'])
+                            <p class="text-white/80 text-sm mt-1 pb-4 leading-snug line-clamp-2 drop-shadow">
                                 {{ $currentCard['bio'] }}
                             </p>
                         @endif
@@ -192,24 +249,26 @@
 
     {{-- ── BOTONES DE ACCIÓN ── --}}
     @if(!$noMoreCards && $currentCard)
-        <div class="flex items-center justify-center gap-8 mt-4">
+        <div class="shrink-0 flex items-center justify-between px-10 pb-8 pt-2">
 
             {{-- Dislike --}}
             <button
                 @click="triggerDislike()"
-                class="size-16 rounded-full bg-zinc-900 border-2 border-red-500/50 flex items-center justify-center shadow-lg hover:border-red-500 hover:bg-red-500/10 active:scale-95 transition-all"
+                class="size-20 rounded-full flex items-center justify-center shadow-xl active:scale-95 transition-transform"
+                style="border: 3px solid #ef4444; background: transparent;"
             >
-                <svg xmlns="http://www.w3.org/2000/svg" class="size-8 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
+                <svg xmlns="http://www.w3.org/2000/svg" class="size-9 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
                 </svg>
             </button>
 
             {{-- Like --}}
             <button
                 @click="triggerLike()"
-                class="size-16 rounded-full bg-zinc-900 border-2 border-green-500/50 flex items-center justify-center shadow-lg hover:border-green-500 hover:bg-green-500/10 active:scale-95 transition-all"
+                class="size-20 rounded-full flex items-center justify-center shadow-xl active:scale-95 transition-transform"
+                style="border: 3px solid #10b981; background: transparent;"
             >
-                <svg xmlns="http://www.w3.org/2000/svg" class="size-8 text-green-400" fill="currentColor" viewBox="0 0 24 24">
+                <svg xmlns="http://www.w3.org/2000/svg" class="size-9 text-emerald-400" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                 </svg>
             </button>
@@ -234,20 +293,22 @@
                 </div>
                 <div class="flex items-center gap-4">
                     <div class="size-24 rounded-full border-4 border-vicio-400 overflow-hidden">
-                        <img src="{{ auth()->user()->profile_photo_url }}" class="w-full h-full object-cover" />
+                        <img src="{{ auth()->user()->profile_photo_url }}" class="w-full h-full object-cover" alt="Tú"/>
                     </div>
                     <div class="text-3xl">❤️</div>
                     <div class="size-24 rounded-full border-4 border-vicio-400 overflow-hidden">
-                        <img src="{{ $lastMatch['profile_photo_url'] }}" class="w-full h-full object-cover" />
+                        <img src="{{ $lastMatch['profile_photo_url'] }}" class="w-full h-full object-cover" alt="{{ $lastMatch['username'] }}"/>
                     </div>
                 </div>
                 <div class="flex flex-col gap-3 w-full max-w-xs">
-                    <button wire:click="dismissMatch"
-                            class="w-full vicio-gradient text-white font-bold py-4 rounded-2xl hover:opacity-90 transition-opacity">
+                    <button
+                        wire:click="dismissMatch"
+                        class="w-full vicio-gradient text-white font-bold py-4 rounded-2xl hover:opacity-90 transition-opacity">
                         💬 Enviar mensaje
                     </button>
-                    <button wire:click="dismissMatch"
-                            class="w-full bg-zinc-800 text-zinc-300 font-semibold py-3.5 rounded-2xl hover:bg-zinc-700 transition-colors">
+                    <button
+                        wire:click="dismissMatch"
+                        class="w-full bg-zinc-800 text-zinc-300 font-semibold py-3.5 rounded-2xl hover:bg-zinc-700 transition-colors">
                         Seguir viendo perfiles
                     </button>
                 </div>

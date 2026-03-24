@@ -7,7 +7,7 @@
 
         {{-- ── HEADER ── --}}
         <div class="flex items-center justify-between px-5 pt-6 pb-2">
-            <img src="{{ asset('images/logo.png') }}" alt="VicioApp" width="70" height="70">
+            <a href={{ route('home') }}><img src="{{ asset('images/Logo.png') }}" alt="VicioApp" width="70" height="70"></a>
             <span class="text-white font-bold text-lg tracking-tight">VicioApp</span>
         </div>
 
@@ -70,7 +70,7 @@
                 ['name' => 'password_confirmation', 'type' => 'password', 'placeholder' => 'Repite la contraseña porfa 👁', 'autocomplete' => 'new-password'],
                 ['name' => 'age',                   'type' => 'number',   'placeholder' => 'Edad, pero sin mentir',         'autocomplete' => 'off'],
             ] as $field)
-                <div style="width:80%; margin:auto;">
+                <div style="width:100%; margin:auto;">
                     <input
                         type="{{ $field['type'] }}"
                         name="{{ $field['name'] }}"
@@ -99,7 +99,7 @@
             @endforeach
 
             {{-- ── BIO ── --}}
-                <div style="width:80%; margin:auto;">
+                <div style="width:100%; margin:auto;">
                 <textarea
                     name="bio"
                     rows="3"

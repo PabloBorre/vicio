@@ -156,7 +156,7 @@ new #[Title('Inicio')] class extends Component
                 </a>
 
                 {{-- Editar perfil --}}
-                <a href="{{ route('profile.edit') }}" wire:navigate
+                <a href="{{ route('profile.edit') }}" 
                     class="w-full font-semibold py-4 rounded-2xl flex items-center justify-center gap-3 transition-opacity hover:opacity-90"
                     style="background-color: rgba(255,255,255,0.25); color: #1a0a2e;">
                     <svg xmlns="http://www.w3.org/2000/svg" class="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

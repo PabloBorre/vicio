@@ -2,18 +2,18 @@
 
     {{-- Header --}}
     <div class="shrink-0 flex items-center justify-between px-4 py-4" style="border-bottom: 1px solid rgba(255,255,255,0.2);">
-        <div>
-            <h1 class="text-white font-bold text-xl">Chats</h1>
-            <p class="text-xs mt-0.5" style="color: rgba(255,255,255,0.6);">Tus matches de la noche</p>
-        </div>
-        <a href="{{ route('dashboard') }}" wire:navigate
-            class="size-9 rounded-full flex items-center justify-center transition-opacity hover:opacity-80"
-            style="background-color: rgba(255,255,255,0.2);">
-            <svg xmlns="http://www.w3.org/2000/svg" class="size-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/>
-            </svg>
-        </a>
+    <a href="{{ route('dashboard') }}" wire:navigate
+        class="size-9 rounded-full flex items-center justify-center transition-opacity hover:opacity-80"
+        style="background-color: rgba(255,255,255,0.2);">
+        <svg xmlns="http://www.w3.org/2000/svg" class="size-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/>
+        </svg>
+    </a>
+    <div class="text-right">
+        <h1 class="text-white font-bold text-xl">Chats</h1>
+        <p class="text-xs mt-0.5" style="color: rgba(255,255,255,0.6);">Tus matches de la noche</p>
     </div>
+</div>
 
     {{-- Lista --}}
     <div class="flex-1 overflow-y-auto">

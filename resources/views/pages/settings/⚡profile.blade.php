@@ -24,8 +24,10 @@ new #[Title('Editar perfil')] class extends Component {
     public string $password              = '';
     public string $password_confirmation = '';
 
-    public function mount(): void
-    {
+public function boot(): void
+{
+    // Solo carga si las propiedades están vacías (primera vez)
+    if ($this->name === '') {
         $user = Auth::user();
         $this->name              = $user->name              ?? '';
         $this->username          = $user->username          ?? '';
@@ -34,74 +36,77 @@ new #[Title('Editar perfil')] class extends Component {
         $this->age               = (string) ($user->age    ?? '');
         $this->sexual_preference = $user->sexual_preference ?? '';
     }
+}
+
+    public function setPref(string $value): void
+    {
+        $this->sexual_preference = $value;
+    }
 
     public function updateProfile(): void
-{
-    $user = Auth::user();
+    {
+        $user = Auth::user();
 
-    // Si el usuario intenta cambiar la contraseña, verificar la actual PRIMERO
-    // antes de cualquier otra validación, para dar feedback inmediato
-    if ($this->current_password || $this->password || $this->password_confirmation) {
-        if (!Hash::check($this->current_password, $user->password)) {
-            $this->addError('current_password', 'La contraseña actual no es correcta.');
-            return;
+        if ($this->current_password || $this->password || $this->password_confirmation) {
+            if (!Hash::check($this->current_password, $user->password)) {
+                $this->addError('current_password', 'La contraseña actual no es correcta.');
+                return;
+            }
+
+            $this->validate([
+                'current_password'      => ['required'],
+                'password'              => ['required', 'string', 'min:8', 'confirmed'],
+                'password_confirmation' => ['required'],
+            ], [
+                'current_password.required' => 'Introduce tu contraseña actual.',
+                'password.min'              => 'La nueva contraseña debe tener al menos 8 caracteres.',
+                'password.confirmed'        => 'Las contraseñas no coinciden.',
+            ]);
         }
 
-        $this->validate([
-            'current_password'      => ['required'],
-            'password'              => ['required', 'string', 'min:8', 'confirmed'],
-            'password_confirmation' => ['required'],
+        $validated = $this->validate([
+            'name'              => ['required', 'string', 'max:255'],
+            'username'          => ['required', 'string', 'min:3', 'max:30', 'unique:users,username,' . $user->id, 'regex:/^[a-zA-Z0-9_]+$/'],
+            'email'             => ['required', 'email', 'max:255', 'unique:users,email,' . $user->id],
+            'bio'               => ['nullable', 'string', 'max:500'],
+            'age'               => ['required', 'integer', 'min:18', 'max:99'],
+            'sexual_preference' => ['required', 'in:man,woman,both'],
+            'photo'             => ['nullable', 'image', 'max:5120', 'mimes:jpg,jpeg,png,webp'],
         ], [
-            'current_password.required' => 'Introduce tu contraseña actual.',
-            'password.min'              => 'La nueva contraseña debe tener al menos 8 caracteres.',
-            'password.confirmed'        => 'Las contraseñas no coinciden.',
+            'username.unique' => 'Este nombre de usuario ya está en uso.',
+            'username.regex'  => 'Solo letras, números y guiones bajos.',
+            'email.unique'    => 'Este email ya está registrado.',
+            'age.min'         => 'Debes tener al menos 18 años.',
         ]);
-    }
 
-    $validated = $this->validate([
-        'name'              => ['required', 'string', 'max:255'],
-        'username'          => ['required', 'string', 'min:3', 'max:30', 'unique:users,username,' . $user->id, 'regex:/^[a-zA-Z0-9_]+$/'],
-        'email'             => ['required', 'email', 'max:255', 'unique:users,email,' . $user->id],
-        'bio'               => ['nullable', 'string', 'max:500'],
-        'age'               => ['required', 'integer', 'min:18', 'max:99'],
-        'sexual_preference' => ['required', 'in:man,woman,both'],
-        'photo'             => ['nullable', 'image', 'max:5120', 'mimes:jpg,jpeg,png,webp'],
-    ], [
-        'username.unique' => 'Este nombre de usuario ya está en uso.',
-        'username.regex'  => 'Solo letras, números y guiones bajos.',
-        'email.unique'    => 'Este email ya está registrado.',
-        'age.min'         => 'Debes tener al menos 18 años.',
-    ]);
-
-    // Actualizar contraseña si se proporcionó (ya validada arriba)
-    if ($this->password) {
-        $user->password = Hash::make($this->password);
-    }
-
-    if ($this->photo) {
-        if ($user->profile_photo_path) {
-            Storage::disk('public')->delete($user->profile_photo_path);
+        if ($this->password) {
+            $user->password = Hash::make($this->password);
         }
-        $validated['profile_photo_path'] = ImageHelper::storeAsWebP($this->photo);
+
+        if ($this->photo) {
+            if ($user->profile_photo_path) {
+                Storage::disk('public')->delete($user->profile_photo_path);
+            }
+            $validated['profile_photo_path'] = ImageHelper::storeAsWebP($this->photo);
+        }
+
+        unset($validated['photo']);
+
+        if (isset($validated['email']) && $validated['email'] !== $user->email) {
+            $user->email_verified_at = null;
+        }
+
+        $user->fill($validated);
+        $user->save();
+
+        $this->photo = null;
+        $this->current_password = '';
+        $this->password = '';
+        $this->password_confirmation = '';
+
+        session()->flash('profile-updated', true);
+        $this->redirect(route('profile.edit'), navigate: false);
     }
-
-    unset($validated['photo']);
-
-    if (isset($validated['email']) && $validated['email'] !== $user->email) {
-        $user->email_verified_at = null;
-    }
-
-    $user->fill($validated);
-    $user->save();
-
-    $this->photo = null;
-    $this->current_password = '';
-    $this->password = '';
-    $this->password_confirmation = '';
-
-    session()->flash('profile-updated', true);
-    $this->redirect(route('profile.edit'), navigate: false);
-}
 }; ?>
 
 <!DOCTYPE html>
@@ -115,7 +120,7 @@ new #[Title('Editar perfil')] class extends Component {
 
     {{-- Header --}}
     <div class="flex items-center justify-between pt-6 pb-4">
-        <a href="{{ route('dashboard') }}" wire:navigate
+        <a href="{{ route('dashboard') }}"
            class="size-10 rounded-full flex items-center justify-center"
            style="background: rgba(255,255,255,0.25);">
             <svg xmlns="http://www.w3.org/2000/svg" class="size-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -123,17 +128,11 @@ new #[Title('Editar perfil')] class extends Component {
             </svg>
         </a>
         <span class="text-white font-bold text-xl tracking-tight">VicioApp</span>
+        <div class="size-10"></div>
     </div>
 
-<form wire:submit.prevent="updateProfile"
-      x-data
-      @submit="
-          let g = document.querySelector('[name=_gender_identity]');
-          let p = document.querySelector('[name=_sexual_preference]');
-          if (g) $wire.set('gender_identity', g.value, false);
-          if (p) $wire.set('sexual_preference', p.value, false);
-      "
-      class="space-y-3">
+    <form wire:submit.prevent="updateProfile" class="space-y-3">
+
         {{-- FOTO con texto curvo --}}
         <div class="flex justify-center py-6">
             <div class="relative" style="width: 180px; height: 180px;">
@@ -163,8 +162,8 @@ new #[Title('Editar perfil')] class extends Component {
         @error('photo') <p class="text-red-200 text-xs text-center -mt-2">{{ $message }}</p> @enderror
 
         @if(session('profile-updated'))
-    <div class="text-center text-white text-sm font-semibold py-1">✓ Cambios guardados</div>
-@endif
+            <div class="text-center text-white text-sm font-semibold py-1">✓ Cambios guardados</div>
+        @endif
 
         {{-- CAMPOS DE TEXTO --}}
         <div>
@@ -203,24 +202,27 @@ new #[Title('Editar perfil')] class extends Component {
             @error('bio') <p class="text-red-200 text-xs text-center mt-1 px-4">{{ $message }}</p> @enderror
         </div>
 
-{{-- PREFERENCIA SEXUAL --}}
-<p class="text-white/70 text-sm text-center" style="padding-top: 8px;">Me gustan:</p>
+        {{-- PREFERENCIA SEXUAL — wire:click directo, sin Alpine ni inputs hidden --}}
+        <p class="text-white/70 text-sm text-center" style="padding-top: 8px;">Me gustan:</p>
 
-<div x-data="{ pref: '{{ $sexual_preference }}' }" class="flex justify-center items-center" style="padding: 8px 0;">
-    <input type="hidden" name="_sexual_preference" x-bind:value="pref" />
-    <button type="button" @click="pref = 'man'"
+        {{-- DESPUÉS --}}
+<div x-data="{ pref: '{{ $sexual_preference }}' }"
+     x-init="$watch('pref', v => $wire.sexual_preference = v)"
+     class="flex justify-center items-center" style="padding: 8px 0;">
+
+    <button type="button" @click.prevent="pref = 'man'"
         class="rounded-full font-semibold text-sm transition-all duration-200"
         style="width:110px; height:110px; position:relative; z-index:3; margin-right:-22px; border:none; cursor:pointer;"
         :style="{ backgroundColor: pref === 'man' ? '#5B1A9E' : '#C8A8DC', color: pref === 'man' ? 'white' : '#2D0A4E' }">
         Hombres
     </button>
-    <button type="button" @click="pref = 'both'"
+    <button type="button" @click.prevent="pref = 'both'"
         class="rounded-full font-semibold text-sm transition-all duration-200"
         style="width:120px; height:120px; position:relative; z-index:2; border:none; cursor:pointer;"
         :style="{ backgroundColor: pref === 'both' ? '#5B1A9E' : '#DCC8EC', color: pref === 'both' ? 'white' : '#2D0A4E' }">
         Ambos
     </button>
-    <button type="button" @click="pref = 'woman'"
+    <button type="button" @click.prevent="pref = 'woman'"
         class="rounded-full font-semibold text-sm transition-all duration-200"
         style="width:110px; height:110px; position:relative; z-index:3; margin-left:-22px; border:none; cursor:pointer;"
         :style="{ backgroundColor: pref === 'woman' ? '#5B1A9E' : '#E8C8F0', color: pref === 'woman' ? 'white' : '#2D0A4E' }">
@@ -229,73 +231,70 @@ new #[Title('Editar perfil')] class extends Component {
 </div>
         @error('sexual_preference') <p class="text-red-200 text-xs text-center mt-1 px-4">{{ $message }}</p> @enderror
 
-{{-- CONTRASEÑA --}}
-<p class="text-white/70 text-sm text-center" style="padding-top: 8px;">Cambiar contraseña</p>
+        {{-- CONTRASEÑA --}}
+        <p class="text-white/70 text-sm text-center" style="padding-top: 8px;">Cambiar contraseña</p>
 
-<div x-data="{ show1: false, show2: false, show3: false }" class="space-y-3">
-    <div>
-        <div class="relative">
-            <input :type="show1 ? 'text' : 'password'" wire:model="current_password"
-                placeholder="Contraseña actual"
-                class="w-full text-white text-center font-medium placeholder-white/60 border-0 focus:outline-none focus:ring-2 focus:ring-white/30"
-                style="background-color: #2D0A4E; font-size: 16px; padding: 18px 50px 18px 24px; border-radius: 9999px; display: block; width: 100%; box-sizing: border-box;"/>
-            <button type="button" @click="show1 = !show1"
-                style="position: absolute; right: 18px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; padding: 0; color: rgba(255,255,255,0.5);">
-                <svg xmlns="http://www.w3.org/2000/svg" style="width:22px; height:22px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                </svg>
-            </button>
-        </div>
-        @error('current_password') <p class="text-red-200 text-xs text-center mt-1 px-4">{{ $message }}</p> @enderror
-    </div>
+        <div x-data="{ show1: false, show2: false, show3: false }" class="space-y-3">
+            <div>
+                <div class="relative">
+                    <input :type="show1 ? 'text' : 'password'" wire:model="current_password"
+                        placeholder="Contraseña actual"
+                        class="w-full text-white text-center font-medium placeholder-white/60 border-0 focus:outline-none focus:ring-2 focus:ring-white/30"
+                        style="background-color: #2D0A4E; font-size: 16px; padding: 18px 50px 18px 24px; border-radius: 9999px; display: block; width: 100%; box-sizing: border-box;"/>
+                    <button type="button" @click="show1 = !show1"
+                        style="position: absolute; right: 18px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; padding: 0; color: rgba(255,255,255,0.5);">
+                        <svg xmlns="http://www.w3.org/2000/svg" style="width:22px; height:22px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                        </svg>
+                    </button>
+                </div>
+                @error('current_password') <p class="text-red-200 text-xs text-center mt-1 px-4">{{ $message }}</p> @enderror
+            </div>
 
-    <div>
-        <div class="relative">
-            <input :type="show2 ? 'text' : 'password'" wire:model="password"
-                placeholder="Nueva contraseña"
-                class="w-full text-white text-center font-medium placeholder-white/60 border-0 focus:outline-none focus:ring-2 focus:ring-white/30"
-                style="background-color: #2D0A4E; font-size: 16px; padding: 18px 50px 18px 24px; border-radius: 9999px; display: block; width: 100%; box-sizing: border-box;"/>
-            <button type="button" @click="show2 = !show2"
-                style="position: absolute; right: 18px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; padding: 0; color: rgba(255,255,255,0.5);">
-                <svg xmlns="http://www.w3.org/2000/svg" style="width:22px; height:22px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                </svg>
-            </button>
-        </div>
-        @error('password') <p class="text-red-200 text-xs text-center mt-1 px-4">{{ $message }}</p> @enderror
-    </div>
+            <div>
+                <div class="relative">
+                    <input :type="show2 ? 'text' : 'password'" wire:model="password"
+                        placeholder="Nueva contraseña"
+                        class="w-full text-white text-center font-medium placeholder-white/60 border-0 focus:outline-none focus:ring-2 focus:ring-white/30"
+                        style="background-color: #2D0A4E; font-size: 16px; padding: 18px 50px 18px 24px; border-radius: 9999px; display: block; width: 100%; box-sizing: border-box;"/>
+                    <button type="button" @click="show2 = !show2"
+                        style="position: absolute; right: 18px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; padding: 0; color: rgba(255,255,255,0.5);">
+                        <svg xmlns="http://www.w3.org/2000/svg" style="width:22px; height:22px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                        </svg>
+                    </button>
+                </div>
+                @error('password') <p class="text-red-200 text-xs text-center mt-1 px-4">{{ $message }}</p> @enderror
+            </div>
 
-    <div>
-        <div class="relative">
-            <input :type="show3 ? 'text' : 'password'" wire:model="password_confirmation"
-                placeholder="Confirmar contraseña"
-                class="w-full text-white text-center font-medium placeholder-white/60 border-0 focus:outline-none focus:ring-2 focus:ring-white/30"
-                style="background-color: #2D0A4E; font-size: 16px; padding: 18px 50px 18px 24px; border-radius: 9999px; display: block; width: 100%; box-sizing: border-box;"/>
-            <button type="button" @click="show3 = !show3"
-                style="position: absolute; right: 18px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; padding: 0; color: rgba(255,255,255,0.5);">
-                <svg xmlns="http://www.w3.org/2000/svg" style="width:22px; height:22px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                </svg>
-            </button>
+            <div>
+                <div class="relative">
+                    <input :type="show3 ? 'text' : 'password'" wire:model="password_confirmation"
+                        placeholder="Repite la nueva contraseña"
+                        class="w-full text-white text-center font-medium placeholder-white/60 border-0 focus:outline-none focus:ring-2 focus:ring-white/30"
+                        style="background-color: #2D0A4E; font-size: 16px; padding: 18px 50px 18px 24px; border-radius: 9999px; display: block; width: 100%; box-sizing: border-box;"/>
+                    <button type="button" @click="show3 = !show3"
+                        style="position: absolute; right: 18px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; padding: 0; color: rgba(255,255,255,0.5);">
+                        <svg xmlns="http://www.w3.org/2000/svg" style="width:22px; height:22px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
         </div>
-    </div>
-</div>
 
-        {{-- BOTÓN --}}
-        <div style="padding-top: 16px;">
-            <button type="submit"
-                class="w-full font-bold text-xl transition-opacity hover:opacity-90"
-                style="background-color: #F0E6D3; color: #2D0A4E; padding: 20px 24px; border-radius: 9999px; border: none;">
-                Guardar cambios
-            </button>
-        </div>
+        {{-- BOTÓN GUARDAR --}}
+        <button type="submit"
+            class="w-full text-white font-bold text-xl transition-opacity hover:opacity-90"
+            style="background-color: #2D0A4E; font-size: 18px; padding: 22px 24px; border-radius: 9999px; border: none; cursor: pointer; margin-top: 8px;">
+            Guardar cambios
+        </button>
 
     </form>
 </div>
 
-@fluxScripts
 </body>
 </html>

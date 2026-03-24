@@ -37,8 +37,8 @@
 
         {{-- ── FIESTA ACTIVA ── --}}
         @if($active)
-            <div>
-                <div class="flex items-center gap-2 mb-3" style="margin-top: 20px">
+            <div style="margin-top: 10px">
+                <div class="flex items-center gap-2 mb-3">
                     <p class="text-xs font-semibold uppercase tracking-wider" style="color: rgba(255,255,255,0.55);">Ahora mismo</p>
                     <span class="flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold text-white" style="background-color: #2d0a3e;">
                         <span class="size-1.5 rounded-full bg-green-400 animate-pulse inline-block"></span>
@@ -46,7 +46,7 @@
                     </span>
                 </div>
 
-                <div class="rounded-2xl overflow-hidden" style="background-color: #2d0a3e;margin-top:20px">
+                <div class="rounded-2xl overflow-hidden" style="background-color: #2d0a3e;margin-top: 10px">
                     @if($active->cover_image)
                         <div class="h-36 overflow-hidden relative">
                             <img src="{{ asset('storage/' . $active->cover_image) }}"
@@ -100,11 +100,29 @@
         {{-- ── PRÓXIMAS ── --}}
         @if($upcoming->isNotEmpty())
             <div>
-                <p class="text-xs font-semibold uppercase tracking-wider mb-3" style="color: rgba(255,255,255,0.55);margin-bottom:10px">Próximas</p>
-                <div class="space-y-3">
+                <p class="text-xs font-semibold uppercase tracking-wider mb-3" style="color: rgba(255,255,255,0.55);">Próximas</p>
+                <div class="space-y-3" style="margin-top: 10px">
                     @foreach($upcoming as $party)
-                        <div class="rounded-2xl px-4 py-4" style="background-color: rgba(255,255,255,0.15);">
-                            <div class="flex items-center justify-between gap-2">
+                        @php $secondsLeft = max(0, now()->diffInSeconds($party->starts_at, false)); @endphp
+                        <div class="rounded-2xl px-4 py-4" style="background-color: rgba(255,255,255,0.15);"
+                            x-data="{
+                                seconds: {{ $secondsLeft }},
+                                get days()    { return Math.floor(this.seconds / 86400) },
+                                get hours()   { return Math.floor((this.seconds % 86400) / 3600) },
+                                get minutes() { return Math.floor((this.seconds % 3600) / 60) },
+                                get secs()    { return Math.floor(this.seconds % 60) },
+                                get pad()     { return v => String(v).padStart(2,'0') },
+                                init() {
+                                    if (this.seconds > 0) {
+                                        const t = setInterval(() => {
+                                            if (this.seconds > 0) this.seconds--;
+                                            else clearInterval(t);
+                                        }, 1000);
+                            }
+                                }
+                            }"
+                        >
+                            <div class="flex items-start justify-between gap-2">
                                 <div class="flex-1 min-w-0">
                                     <h3 class="text-white font-semibold text-base truncate">{{ $party->name }}</h3>
                                     @if($party->location)
@@ -117,12 +135,41 @@
                                         </p>
                                     @endif
                                     <p class="text-xs mt-1" style="color: rgba(255,255,255,0.5);">
-                                        📅 {{ $party->starts_at->format('d M · H:i') }}
+                                        {{ $party->starts_at->format('d M · H:i') }}
                                     </p>
                                 </div>
                                 <span class="px-2.5 py-1 rounded-full text-xs font-semibold shrink-0" style="background-color: rgba(255,255,255,0.2); color: rgba(255,255,255,0.85);">
                                     Próxima
                                 </span>
+                            </div>
+
+                            {{-- Cuenta atrás --}}
+                            <div class="mt-3 pt-3" style="border-top: 1px solid rgba(255,255,255,0.1);">
+                                <p class="text-xs text-center mb-2" style="color: rgba(255,255,255,0.45);">Empieza en</p>
+                                <div class="flex gap-2" x-show="seconds > 0">
+                                    <div class="flex-1 flex flex-col items-center rounded-xl py-2" style="background-color: rgba(0,0,0,0.15);">
+                                        <span class="text-white font-bold text-xl leading-none" x-text="pad(days)">00</span>
+                                        <span class="text-xs mt-1" style="color: rgba(255,255,255,0.45);">días</span>
+                                    </div>
+                                    <div class="flex-1 flex flex-col items-center rounded-xl py-2" style="background-color: rgba(0,0,0,0.15);">
+                                        <span class="text-white font-bold text-xl leading-none" x-text="pad(hours)">00</span>
+                                        <span class="text-xs mt-1" style="color: rgba(255,255,255,0.45);">horas</span>
+                                    </div>
+                                    <div class="flex-1 flex flex-col items-center rounded-xl py-2" style="background-color: rgba(0,0,0,0.15);">
+                                        <span class="text-white font-bold text-xl leading-none" x-text="pad(minutes)">00</span>
+                                        <span class="text-xs mt-1" style="color: rgba(255,255,255,0.45);">min</span>
+                                    </div>
+                                    <div class="flex-1 flex flex-col items-center rounded-xl py-2" style="background-color: rgba(0,0,0,0.15);">
+                                        <span class="text-white font-bold text-xl leading-none" x-text="pad(secs)">00</span>
+                                        <span class="text-xs mt-1" style="color: rgba(255,255,255,0.45);">seg</span>
+                                    </div>
+                                </div>
+                                <div x-show="seconds === 0"
+                                    class="flex items-center justify-center gap-2 py-2 rounded-xl font-semibold text-sm"
+                                    style="background-color: rgba(74,222,128,0.15); color: #4ade80;">
+                                    <span class="size-2 rounded-full bg-green-400 animate-pulse inline-block"></span>
+                                    ¡Empezando ahora!
+                                </div>
                             </div>
                         </div>
                     @endforeach
@@ -133,8 +180,8 @@
         {{-- ── PASADAS ── --}}
         @if($finished->isNotEmpty())
             <div>
-                <p class="text-xs font-semibold uppercase tracking-wider mb-3" style="color: rgba(255,255,255,0.55);margin-bottom:10px">Pasadas</p>
-                <div class="space-y-3">
+                <p class="text-xs font-semibold uppercase tracking-wider mb-3" style="color: rgba(255,255,255,0.55);">Pasadas</p>
+                <div class="space-y-3" style="margin-top: 10px">
                     @foreach($finished as $party)
                         <div class="rounded-2xl px-4 py-4" style="background-color: rgba(0,0,0,0.15);">
                             <div class="flex items-center justify-between gap-2">

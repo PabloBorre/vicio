@@ -53,7 +53,7 @@
                     <div class="flex items-center justify-between gap-2 mt-0.5">
                         <p class="text-xs truncate {{ $match['unread'] > 0 ? 'font-semibold text-white' : '' }}"
                             style="{{ $match['unread'] > 0 ? '' : 'color: rgba(255,255,255,0.6);' }}">
-                            {{ $match['last_message'] ?? 'Di algo bonito 👋' }}
+                            {{ $match['last_message'] ?? 'Di algo bonito' }}
                         </p>
                     </div>
                 </div>

@@ -25,7 +25,7 @@
     <div class="flex-1 overflow-y-auto px-4 py-5 space-y-4">
 
         {{-- Cambio de estado --}}
-        <div class="rounded-2xl p-4 space-y-3" style="background-color: rgba(255,255,255,0.15);">
+        <div class="rounded-2xl p-4 space-y-3" style="background-color: rgba(255,255,255,0.15);margin-top:10px">
             <p class="text-sm font-semibold" style="color: rgba(255,255,255,0.85);">Estado de la fiesta</p>
             <form method="POST" action="{{ route('admin.parties.status', $party) }}" class="flex gap-2">
                 @csrf @method('PATCH')

@@ -185,7 +185,7 @@
                 </div>
                 <button wire:click="reload"
                         class="mt-2 px-6 py-2.5 rounded-xl bg-zinc-800 text-zinc-300 text-sm font-medium hover:bg-zinc-700 transition-colors">
-                    🔄 Actualizar
+                    Actualizar
                 </button>
             </div>
 

@@ -7,6 +7,10 @@
 
     <livewire:party.party-show :party="$party" />
 
+@auth
+    <livewire:auth.ban-watcher />
+@endauth
+
     @fluxScripts
 </body>
 </html>

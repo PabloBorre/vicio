@@ -7,6 +7,10 @@ Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
     return (int) $user->id === (int) $id;
 });
 
+Broadcast::channel('user.{id}', function ($user, $id) {
+    return (int) $user->id === (int) $id;
+});
+
 Broadcast::channel('chat.{matchId}', function ($user, $matchId) {
     $match = PartyMatch::find($matchId);
     if (! $match) return false;

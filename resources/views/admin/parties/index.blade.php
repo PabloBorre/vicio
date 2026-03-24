@@ -96,8 +96,8 @@
 
                         {{-- Meta --}}
                         <div class="flex items-center gap-3 text-xs" style="color: {{ $isFinished ? 'rgba(255,255,255,0.35)' : 'rgba(255,255,255,0.55)' }};">
-                            <span>📅 {{ $party->starts_at->format('d M · H:i') }}</span>
-                            <span>👥 {{ $party->users_count }} asistentes</span>
+                            <span> {{ $party->starts_at->format('d M · H:i') }}</span>
+                            <span> {{ $party->users_count }} asistentes</span>
                         </div>
 
                         {{-- Acciones --}}

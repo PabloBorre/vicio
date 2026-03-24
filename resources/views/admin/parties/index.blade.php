@@ -1,4 +1,3 @@
-<x-layouts::app.sidebar>
     <div class="max-w-5xl mx-auto px-4 py-8 space-y-6">
 
         {{-- Header --}}
@@ -159,4 +158,3 @@
             @endif
         </div>
     </div>
-</x-layouts::app.sidebar>

@@ -10,11 +10,31 @@ new #[Title('Inicio')] class extends Component
     }
 }; ?>
 
-<x-layouts::app.sidebar>
-    <div class="h-full flex flex-col items-center justify-center px-4 py-8 gap-8 text-center">
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+    @include('partials.head')
+</head>
+<body class="h-dvh bg-zinc-950 overflow-hidden">
+<div class="w-full max-w-[430px] mx-auto flex flex-col overflow-y-auto" style="height: 100dvh; background-color: #0a0212;">
+
+    {{-- Header --}}
+    <div class="shrink-0 flex items-center justify-between px-4 py-3 border-b border-zinc-800">
+        <div class="flex items-center gap-2">
+            <div class="size-8 rounded-full vicio-gradient flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="size-4 fill-white">
+                    <path d="M12 2C9.5 5 8 7.5 8 10c0 2.2 1.8 4 4 4s4-1.8 4-4c0-.5-.1-1-.2-1.4C17.2 10 18 11.9 18 14c0 3.3-2.7 6-6 6s-6-2.7-6-6c0-4 3-8 6-10zm0 10c-.6 0-1-.4-1-1 0-.9.5-1.8 1-2.5.5.7 1 1.6 1 2.5 0 .6-.4 1-1 1z"/>
+                </svg>
+            </div>
+            <span class="text-white font-bold text-lg">VicioApp</span>
+        </div>
+    </div>
+
+    {{-- Contenido --}}
+    <div class="flex-1 flex flex-col items-center justify-center px-4 py-8 gap-8 text-center">
 
         {{-- Bienvenida --}}
-        <div class="flex flex-col items-center gap-3">
+        <div class="flex flex-col items-center gap-3" style="margin-top: 100px">
             <div class="size-16 rounded-full vicio-gradient flex items-center justify-center shadow-lg">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="size-8 fill-white">
                     <path d="M12 2C9.5 5 8 7.5 8 10c0 2.2 1.8 4 4 4s4-1.8 4-4c0-.5-.1-1-.2-1.4C17.2 10 18 11.9 18 14c0 3.3-2.7 6-6 6s-6-2.7-6-6c0-4 3-8 6-10zm0 10c-.6 0-1-.4-1-1 0-.9.5-1.8 1-2.5.5.7 1 1.6 1 2.5 0 .6-.4 1-1 1z"/>
@@ -56,7 +76,6 @@ new #[Title('Inicio')] class extends Component
 
         {{-- Acciones principales --}}
         <div class="flex flex-col gap-3 w-full max-w-sm">
-            {{-- Ir a chats --}}
             <a href="{{ route('chats.index') }}" wire:navigate
                 class="w-full bg-zinc-900 border border-zinc-800 text-white font-semibold py-4 rounded-2xl flex items-center justify-center gap-3 hover:border-zinc-700 transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" class="size-5 text-vicio-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -67,31 +86,46 @@ new #[Title('Inicio')] class extends Component
                     <span class="ml-auto size-5 rounded-full bg-vicio text-white text-xs font-bold flex items-center justify-center">{{ $unread }}</span>
                 @endif
             </a>
+
+            {{-- Fiesta activa --}}
+            @if(!auth()->user()->is_admin)
+                @php
+                    $currentParty = auth()->user()->parties()
+                        ->whereIn('parties.status', ['registration', 'countdown', 'active'])
+                        ->latest('pivot_joined_at')
+                        ->first();
+                @endphp
+                @if($currentParty)
+                    @php
+                        $partyRoute = $currentParty->status === 'active'
+                            ? route('party.swipe', $currentParty->qr_code)
+                            : route('party.waiting', $currentParty->qr_code);
+                    @endphp
+                    <a href="{{ $partyRoute }}" wire:navigate
+                       class="w-full vicio-gradient text-white font-bold py-4 rounded-2xl flex items-center justify-center gap-3 hover:opacity-90 transition-opacity">
+                        <span>{{ $currentParty->status === 'active' ? '🔥 Volver a la fiesta' : '⏳ Sala de espera' }}</span>
+                    </a>
+                @endif
+            @endif
+
+            {{-- Editar perfil --}}
+            <a href="{{ route('profile.edit') }}" wire:navigate
+               class="w-full bg-zinc-900 border border-zinc-800 text-white font-semibold py-4 rounded-2xl flex items-center justify-center gap-3 hover:border-zinc-700 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="size-5 text-vicio-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                </svg>
+                Editar perfil
+            </a>
         </div>
 
-{{-- Fiesta activa si existe (solo usuarios normales) --}}
-        @if(!auth()->user()->is_admin)
-            @if($currentParty = auth()->user()->currentParty?->status !== 'finished' ? auth()->user()->currentParty : null)
-                <div class="w-full max-w-sm bg-vicio-900/30 border border-vicio-700/50 rounded-2xl p-4 flex items-center gap-4">
-                    <div class="size-10 rounded-full vicio-gradient flex items-center justify-center shrink-0">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="size-5 fill-white" viewBox="0 0 24 24">
-                            <path d="M12 2C9.5 5 8 7.5 8 10c0 2.2 1.8 4 4 4s4-1.8 4-4c0-.5-.1-1-.2-1.4C17.2 10 18 11.9 18 14c0 3.3-2.7 6-6 6s-6-2.7-6-6c0-4 3-8 6-10z"/>
-                        </svg>
-                    </div>
-                    <div class="flex-1 min-w-0">
-                        <p class="text-white font-semibold text-sm truncate">{{ $currentParty->name }}</p>
-                        <p class="text-vicio-300 text-xs">Fiesta activa</p>
-                    </div>
-                    
-                    <a    href="{{ route('party.' . ($currentParty->status === 'active' ? 'swipe' : 'waiting'), $currentParty->qr_code) }}"
-                        wire:navigate
-                        class="shrink-0 text-vicio-300 text-sm font-semibold hover:text-vicio-200 transition-colors"
-                    >
-                        Entrar →
-                    </a>
-                </div>
-            @endif
-        @endif        
+@auth
+    <livewire:chat.chat-notification />
+    @if(!auth()->user()->is_admin)
+        <livewire:auth.ban-watcher />
+    @endif
+    @include('partials.push-prompt')
+@endauth
 
-    </div>
-</x-layouts::app.sidebar>
+@fluxScripts
+</body>
+</html>

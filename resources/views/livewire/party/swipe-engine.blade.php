@@ -138,12 +138,12 @@
                 style="display: none;"
             >
                 <a
-                    href="{{ route('profile.edit') }}"
+                    href="{{ route('dashboard') }}"
                     wire:navigate
                     class="w-full text-center px-6 py-4 rounded-2xl font-semibold text-lg whitespace-nowrap shadow-lg transition-colors"
                     style="background: #f5f0eb; color: #49197C;"
                 >
-                    Editar perfil
+                    Mi perfil
                 </a>
                 <a
                     href="{{ route('dashboard') }}"

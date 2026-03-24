@@ -2,12 +2,14 @@
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 use App\Support\ImageHelper;
 use Livewire\WithFileUploads;
 
-new #[Title('Ajustes de perfil')] class extends Component {
+new #[Title('Editar perfil')] class extends Component {
     use WithFileUploads;
 
     public string $name              = '';
@@ -18,6 +20,10 @@ new #[Title('Ajustes de perfil')] class extends Component {
     public string $gender_identity   = '';
     public string $sexual_preference = '';
     public $photo = null;
+
+    public string $current_password      = '';
+    public string $password              = '';
+    public string $password_confirmation = '';
 
     public function mount(): void
     {
@@ -50,11 +56,34 @@ new #[Title('Ajustes de perfil')] class extends Component {
             'age.min'         => 'Debes tener al menos 18 años.',
         ]);
 
+        // Contraseña (opcional)
+        if ($this->current_password || $this->password) {
+            $this->validate([
+                'current_password'      => ['required'],
+                'password'              => ['required', 'min:8', 'confirmed'],
+                'password_confirmation' => ['required'],
+            ], [
+                'current_password.required' => 'Introduce tu contraseña actual.',
+                'password.min'              => 'La nueva contraseña debe tener al menos 8 caracteres.',
+                'password.confirmed'        => 'Las contraseñas no coinciden.',
+            ]);
+
+            if (!Hash::check($this->current_password, $user->password)) {
+                throw ValidationException::withMessages([
+                    'current_password' => 'La contraseña actual no es correcta.',
+                ]);
+            }
+
+            $user->password = Hash::make($this->password);
+        }
+
         if ($this->photo) {
             if ($user->profile_photo_path) {
                 Storage::disk('public')->delete($user->profile_photo_path);
             }
-$validated['profile_photo_path'] = ImageHelper::storeAsWebP($this->photo);        }
+            $validated['profile_photo_path'] = ImageHelper::storeAsWebP($this->photo);
+        }
+
         unset($validated['photo']);
 
         if (isset($validated['email']) && $validated['email'] !== $user->email) {
@@ -65,125 +94,203 @@ $validated['profile_photo_path'] = ImageHelper::storeAsWebP($this->photo);      
         $user->save();
 
         $this->photo = null;
+        $this->current_password = '';
+        $this->password = '';
+        $this->password_confirmation = '';
+
         $this->dispatch('profile-updated');
     }
 }; ?>
 
-<section class="w-full">
-    @include('partials.settings-heading')
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+    @include('partials.head')
+</head>
+<body style="margin:0; padding:0; min-height:100dvh; background-color: #A678C8;">
 
-    <x-pages::settings.layout
-        :heading="__('Perfil')"
-        :subheading="__('Actualiza tu informacion personal')"
-    >
-        <form wire:submit="updateProfile" class="my-6 w-full space-y-5">
+<div class="w-full max-w-[430px] mx-auto" style="min-height:100dvh; background-color: #A678C8; padding: 0 20px 50px 20px;">
 
-            {{-- FOTO --}}
-            <div class="flex flex-col items-start gap-3">
-                <label class="text-sm font-medium text-zinc-300">Foto de perfil</label>
-                <div class="flex items-center gap-4">
-                    <div class="size-20 rounded-full overflow-hidden bg-zinc-800 border border-zinc-700 shrink-0">
+    {{-- Header --}}
+    <div class="flex items-center justify-between pt-6 pb-4">
+        <a href="{{ route('dashboard') }}" wire:navigate
+           class="size-10 rounded-full flex items-center justify-center"
+           style="background: rgba(255,255,255,0.25);">
+            <svg xmlns="http://www.w3.org/2000/svg" class="size-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/>
+            </svg>
+        </a>
+        <span class="text-white font-bold text-xl tracking-tight">VicioApp</span>
+    </div>
+
+    <form wire:submit.prevent="updateProfile" class="space-y-3">
+
+        {{-- FOTO con texto curvo --}}
+        <div class="flex justify-center py-6">
+            <div class="relative" style="width: 180px; height: 180px;">
+                <svg viewBox="0 0 170 170" class="absolute inset-0 w-full h-full" style="z-index:2; pointer-events:none;">
+                    <defs>
+<path id="circle-text" d="M 85,85 m -74,0 a 74,74 0 1,1 148,0 a 74,74 0 1,1 -148,0"/>                    </defs>
+                    <text font-size="12" font-weight="600" fill="white" font-family="sans-serif" letter-spacing="1.5">
+                        <textPath href="#circle-text" startOffset="2%">
+                            La foto más viciosa de tu galería, pero sin pasarte
+                        </textPath>
+                    </text>
+                </svg>
+                <label for="photo-upload" class="cursor-pointer block" style="position:absolute; inset:18px; z-index:1;">
+                    <div class="w-full h-full rounded-full overflow-hidden" style="border: 4px solid rgba(255,255,255,0.7);">
                         @if($photo)
-                            <img src="{{ $photo->temporaryUrl() }}" class="w-full h-full object-cover" />
+                            <img src="{{ $photo->temporaryUrl() }}" class="w-full h-full object-cover"/>
                         @else
-                            <img src="{{ Auth::user()->profile_photo_url }}" class="w-full h-full object-cover" />
+                            <img src="{{ Auth::user()->profile_photo_url }}" class="w-full h-full object-cover"/>
                         @endif
                     </div>
-                    <div>
-                        <label for="photo-upload" class="cursor-pointer inline-flex items-center gap-2 px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-sm font-medium rounded-xl border border-zinc-700 transition-colors">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                            </svg>
-                            Cambiar foto
-                        </label>
-                        <input id="photo-upload" type="file" wire:model="photo" accept="image/*" class="hidden" />
-                        <p class="text-zinc-600 text-xs mt-1.5">JPG, PNG o WebP. Max 5 MB</p>
-                    </div>
-                </div>
-                @error('photo') <p class="text-red-400 text-xs">{{ $message }}</p> @enderror
+                </label>
+                <input id="photo-upload" type="file" wire:model="photo" accept="image/*" class="hidden"/>
             </div>
+        </div>
 
-            {{-- NOMBRE --}}
-            <flux:input wire:model="name" label="Nombre completo" type="text" required autocomplete="name" />
+        @error('photo') <p class="text-red-200 text-xs text-center -mt-2">{{ $message }}</p> @enderror
 
-            {{-- USERNAME --}}
-            <flux:input wire:model="username" label="Nombre de usuario" type="text" required description="Solo letras, numeros y guiones bajos" />
+        <x-action-message on="profile-updated">
+            <div class="text-center text-white text-sm font-semibold py-1">✓ Cambios guardados</div>
+        </x-action-message>
 
-            {{-- EMAIL --}}
-            <flux:input wire:model="email" label="Email" type="email" required autocomplete="email" />
+        {{-- CAMPOS DE TEXTO --}}
+        <div>
+            <input type="text" wire:model="name" placeholder="Tu nombre de viciosx"
+                class="w-full text-white text-center font-medium placeholder-white/60 border-0 focus:outline-none focus:ring-2 focus:ring-white/30"
+                style="background-color: #2D0A4E; font-size: 16px; padding: 18px 24px; border-radius: 9999px;"/>
+            @error('name') <p class="text-red-200 text-xs text-center mt-1 px-4">{{ $message }}</p> @enderror
+        </div>
 
-            {{-- EDAD --}}
-            <flux:input wire:model="age" label="Edad" type="number" min="18" max="99" required />
+        <div>
+            <input type="text" wire:model="username" placeholder="Nombre de usuario"
+                class="w-full text-white text-center font-medium placeholder-white/60 border-0 focus:outline-none focus:ring-2 focus:ring-white/30"
+                style="background-color: #2D0A4E; font-size: 16px; padding: 18px 24px; border-radius: 9999px;"/>
+            @error('username') <p class="text-red-200 text-xs text-center mt-1 px-4">{{ $message }}</p> @enderror
+        </div>
 
-            {{-- GENERO (solo lectura) --}}
-            <div class="space-y-2">
-                <label class="text-sm font-medium text-zinc-300">Me identifico como</label>
-                <div class="flex items-center gap-3 px-4 py-3 bg-zinc-900 border border-zinc-800 rounded-xl">
-                    <span class="text-xl">
-                        {{ $gender_identity === 'man' ? '👨' : '👩' }}
-                    </span>
-                    <span class="text-white text-sm font-medium">
-                        {{ $gender_identity === 'man' ? 'Hombre' : 'Mujer' }}
-                    </span>
-                    <span class="ml-auto text-zinc-600 text-xs">No modificable</span>
-                </div>
-            </div>
+        <div>
+            <input type="email" wire:model="email" placeholder="Tu email"
+                class="w-full text-white text-center font-medium placeholder-white/60 border-0 focus:outline-none focus:ring-2 focus:ring-white/30"
+                style="background-color: #2D0A4E; font-size: 16px; padding: 18px 24px; border-radius: 9999px;"/>
+            @error('email') <p class="text-red-200 text-xs text-center mt-1 px-4">{{ $message }}</p> @enderror
+        </div>
 
-            {{-- PREFERENCIA --}}
-            <div class="space-y-2">
-                <label class="text-sm font-medium text-zinc-300">Me gustan</label>
-                <div class="grid grid-cols-3 gap-3">
-                    <button type="button" wire:click="$set('sexual_preference', 'man')"
-                        @class([
-                            'flex flex-col items-center gap-1.5 py-4 rounded-2xl text-sm font-semibold border-2 transition-all duration-200',
-                            'bg-vicio-600 text-white border-vicio-500'                                        => $sexual_preference === 'man',
-                            'bg-zinc-900 text-zinc-400 border-zinc-700 hover:border-zinc-500 hover:text-zinc-300' => $sexual_preference !== 'man',
-                        ])>
-                        <span class="text-2xl">👨</span>
-                        <span class="text-xs text-center leading-tight">Hombres</span>
-                    </button>
-                    <button type="button" wire:click="$set('sexual_preference', 'woman')"
-                        @class([
-                            'flex flex-col items-center gap-1.5 py-4 rounded-2xl text-sm font-semibold border-2 transition-all duration-200',
-                            'bg-vicio-600 text-white border-vicio-500'                                        => $sexual_preference === 'woman',
-                            'bg-zinc-900 text-zinc-400 border-zinc-700 hover:border-zinc-500 hover:text-zinc-300' => $sexual_preference !== 'woman',
-                        ])>
-                        <span class="text-2xl">👩</span>
-                        <span class="text-xs text-center leading-tight">Mujeres</span>
-                    </button>
-                    <button type="button" wire:click="$set('sexual_preference', 'both')"
-                        @class([
-                            'flex flex-col items-center gap-1.5 py-4 rounded-2xl text-sm font-semibold border-2 transition-all duration-200',
-                            'bg-vicio-600 text-white border-vicio-500'                                        => $sexual_preference === 'both',
-                            'bg-zinc-900 text-zinc-400 border-zinc-700 hover:border-zinc-500 hover:text-zinc-300' => $sexual_preference !== 'both',
-                        ])>
-                        <span class="text-2xl">💞</span>
-                        <span class="text-xs text-center leading-tight">Ambos</span>
-                    </button>
-                </div>
-                @error('sexual_preference') <p class="text-red-400 text-xs">{{ $message }}</p> @enderror
-            </div>
+        <div>
+            <input type="number" wire:model="age" placeholder="Edad, pero sin mentir" min="18" max="99"
+                class="w-full text-white text-center font-medium placeholder-white/60 border-0 focus:outline-none focus:ring-2 focus:ring-white/30"
+                style="background-color: #2D0A4E; font-size: 16px; padding: 18px 24px; border-radius: 9999px;"/>
+            @error('age') <p class="text-red-200 text-xs text-center mt-1 px-4">{{ $message }}</p> @enderror
+        </div>
 
-            {{-- BIO --}}
-            <div class="space-y-1.5">
-                <label class="text-sm font-medium text-zinc-300">Sobre ti <span class="text-zinc-500 text-xs font-normal">(max. 500 caracteres)</span></label>
-                <textarea wire:model="bio" rows="3" maxlength="500"
-                    class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-3 text-white placeholder-zinc-600 focus:outline-none focus:border-vicio-400 focus:ring-1 focus:ring-vicio-400 transition-colors resize-none text-sm"
-                    placeholder="Cuentanos algo de ti..."></textarea>
-                @error('bio') <p class="text-red-400 text-xs">{{ $message }}</p> @enderror
-            </div>
+        <div>
+            <textarea wire:model="bio" placeholder="Cuéntanos algo de ti, pero tómatelo en serio, más que en tu bio de Insta"
+                rows="3"
+                class="w-full text-white text-center font-medium placeholder-white/60 border-0 focus:outline-none focus:ring-2 focus:ring-white/30 resize-none"
+                style="background-color: #2D0A4E; font-size: 16px; padding: 18px 24px; border-radius: 28px;"></textarea>
+            @error('bio') <p class="text-red-200 text-xs text-center mt-1 px-4">{{ $message }}</p> @enderror
+        </div>
 
-            {{-- SUBMIT --}}
-            <div class="flex items-center gap-4 pt-1">
-                <flux:button variant="primary" type="submit">
-                    {{ __('Guardar cambios') }}
-                </flux:button>
-                <x-action-message on="profile-updated">
-                    Guardado
-                </x-action-message>
-            </div>
-        </form>
+        {{-- CONTRASEÑA --}}
+        <p class="text-white/70 text-sm text-center" style="padding-top: 8px;">Cambiar contraseña</p>
 
-        <livewire:pages::settings.delete-user-form />
-    </x-pages::settings.layout>
-</section>
+        <div x-data="{ show1: false, show2: false, show3: false }" class="space-y-3">
+    <div>
+        <div class="relative">
+            <input :type="show1 ? 'text' : 'password'" wire:model="current_password"
+                placeholder="Contraseña actual"
+                class="w-full text-white text-center font-medium placeholder-white/60 border-0 focus:outline-none focus:ring-2 focus:ring-white/30"
+                style="background-color: #2D0A4E; font-size: 16px; padding: 18px 50px 18px 24px; border-radius: 9999px; display: block; width: 100%; box-sizing: border-box;"/>
+            <button type="button" @click="show1 = !show1"
+                style="position: absolute; right: 18px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; padding: 0; color: rgba(255,255,255,0.5);">
+                <svg xmlns="http://www.w3.org/2000/svg" style="width:22px; height:22px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                </svg>
+            </button>
+        </div>
+        @error('current_password') <p class="text-red-200 text-xs text-center mt-1 px-4">{{ $message }}</p> @enderror
+    </div>
+
+    <div>
+        <div class="relative">
+            <input :type="show2 ? 'text' : 'password'" wire:model="password"
+                placeholder="Nueva contraseña"
+                class="w-full text-white text-center font-medium placeholder-white/60 border-0 focus:outline-none focus:ring-2 focus:ring-white/30"
+                style="background-color: #2D0A4E; font-size: 16px; padding: 18px 50px 18px 24px; border-radius: 9999px; display: block; width: 100%; box-sizing: border-box;"/>
+            <button type="button" @click="show2 = !show2"
+                style="position: absolute; right: 18px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; padding: 0; color: rgba(255,255,255,0.5);">
+                <svg xmlns="http://www.w3.org/2000/svg" style="width:22px; height:22px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                </svg>
+            </button>
+        </div>
+        @error('password') <p class="text-red-200 text-xs text-center mt-1 px-4">{{ $message }}</p> @enderror
+    </div>
+
+    <div>
+        <div class="relative">
+            <input :type="show3 ? 'text' : 'password'" wire:model="password_confirmation"
+                placeholder="Confirmar contraseña"
+                class="w-full text-white text-center font-medium placeholder-white/60 border-0 focus:outline-none focus:ring-2 focus:ring-white/30"
+                style="background-color: #2D0A4E; font-size: 16px; padding: 18px 50px 18px 24px; border-radius: 9999px; display: block; width: 100%; box-sizing: border-box;"/>
+            <button type="button" @click="show3 = !show3"
+                style="position: absolute; right: 18px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; padding: 0; color: rgba(255,255,255,0.5);">
+                <svg xmlns="http://www.w3.org/2000/svg" style="width:22px; height:22px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+</div>
+
+        {{-- PREFERENCIA --}}
+        <p class="text-white/70 text-sm text-center" style="padding-top: 8px;">Me gustan:</p>
+
+<div class="flex justify-center items-center" style="padding: 8px 0;">
+    <button 
+        type="button"
+        wire:click.prevent="$set('sexual_preference', 'man')"
+        class="rounded-full font-semibold text-sm transition-all duration-200"
+        style="width:110px; height:110px; position:relative; z-index:3; margin-right:-22px; border:none; cursor:pointer;"
+        :style="{ backgroundColor: $wire.sexual_preference === 'man' ? '#5B1A9E' : '#C8A8DC', color: $wire.sexual_preference === 'man' ? 'white' : '#2D0A4E' }">
+        Hombres
+    </button>
+    <button 
+        type="button"
+        wire:click.prevent="$set('sexual_preference', 'both')"
+        class="rounded-full font-semibold text-sm transition-all duration-200"
+        style="width:120px; height:120px; position:relative; z-index:2; border:none; cursor:pointer;"
+        :style="{ backgroundColor: $wire.sexual_preference === 'both' ? '#5B1A9E' : '#DCC8EC', color: $wire.sexual_preference === 'both' ? 'white' : '#2D0A4E' }">
+        Ambos
+    </button>
+    <button 
+        type="button"
+        wire:click.prevent="$set('sexual_preference', 'woman')"
+        class="rounded-full font-semibold text-sm transition-all duration-200"
+        style="width:110px; height:110px; position:relative; z-index:3; margin-left:-22px; border:none; cursor:pointer;"
+        :style="{ backgroundColor: $wire.sexual_preference === 'woman' ? '#5B1A9E' : '#E8C8F0', color: $wire.sexual_preference === 'woman' ? 'white' : '#2D0A4E' }">
+        Mujeres
+    </button>
+</div>
+        @error('sexual_preference') <p class="text-red-200 text-xs text-center mt-1 px-4">{{ $message }}</p> @enderror
+
+        {{-- BOTÓN --}}
+        <div style="padding-top: 16px;">
+            <button type="submit"
+                class="w-full font-bold text-xl transition-opacity hover:opacity-90"
+                style="background-color: #F0E6D3; color: #2D0A4E; padding: 20px 24px; border-radius: 9999px; border: none;">
+                Editar perfil
+            </button>
+        </div>
+
+    </form>
+</div>
+
+@fluxScripts
+</body>
+</html>

@@ -74,10 +74,10 @@ return [
     */
 
     'home' => function () {
-    return session()->has('url.intended') 
-        ? session('url.intended') 
-        : '/dashboard';
-},  
+    return session()->has('url.intended')
+        ? session('url.intended')
+        : '/parties';
+},
 
     /*
     |--------------------------------------------------------------------------

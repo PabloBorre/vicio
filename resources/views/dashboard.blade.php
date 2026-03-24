@@ -15,64 +15,71 @@ new #[Title('Inicio')] class extends Component
 <head>
     @include('partials.head')
 </head>
-<body class="h-dvh bg-zinc-950 overflow-hidden">
-<div class="w-full max-w-[430px] mx-auto flex flex-col overflow-y-auto" style="height: 100dvh; background-color: #0a0212;">
+<body class="h-dvh overflow-hidden" style="background-color: #A678C8;">
+<div class="w-full max-w-[430px] mx-auto flex flex-col overflow-y-auto" style="height: 100dvh; background-color: #A678C8; ">
 
     {{-- Header --}}
-    <div class="shrink-0 flex items-center justify-between px-4 py-3 border-b border-zinc-800">
+    <div class="shrink-0 flex items-center justify-between px-4 py-3" style="border-bottom: 1px solid rgba(255,255,255,0.2);">
         <div class="flex items-center gap-2">
-            <div class="size-8 rounded-full vicio-gradient flex items-center justify-center">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="size-4 fill-white">
-                    <path d="M12 2C9.5 5 8 7.5 8 10c0 2.2 1.8 4 4 4s4-1.8 4-4c0-.5-.1-1-.2-1.4C17.2 10 18 11.9 18 14c0 3.3-2.7 6-6 6s-6-2.7-6-6c0-4 3-8 6-10zm0 10c-.6 0-1-.4-1-1 0-.9.5-1.8 1-2.5.5.7 1 1.6 1 2.5 0 .6-.4 1-1 1z"/>
-                </svg>
-            </div>
-            <span class="text-white font-bold text-lg">VicioApp</span>
+            <span class="text-white font-bold text-xl tracking-tight">VicioApp</span>
         </div>
     </div>
 
     {{-- Contenido --}}
-    <div class="flex-1 flex flex-col items-center justify-center px-4 py-8 gap-8 text-center">
+    <div class="flex-1 flex flex-col items-center px-4 py-8 gap-6" style="margin-top: 10vh;">
 
         @if(auth()->user()->is_admin)
 
-            {{-- ── VISTA ADMIN ── --}}
-            <div class="flex flex-col items-center gap-3">
-                <div class="size-16 rounded-full vicio-gradient flex items-center justify-center shadow-lg">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="size-8 fill-white" viewBox="0 0 24 24">
-                        <path d="M12 2C9.5 5 8 7.5 8 10c0 2.2 1.8 4 4 4s4-1.8 4-4c0-.5-.1-1-.2-1.4C17.2 10 18 11.9 18 14c0 3.3-2.7 6-6 6s-6-2.7-6-6c0-4 3-8 6-10zm0 10c-.6 0-1-.4-1-1 0-.9.5-1.8 1-2.5.5.7 1 1.6 1 2.5 0 .6-.4 1-1 1z"/>
-                    </svg>
+            {{-- ══════════════════════════════════
+                 VISTA ADMIN
+            ══════════════════════════════════ --}}
+
+            {{-- Avatar + saludo --}}
+            <div class="flex flex-col items-center gap-3 w-full pt-4">
+                <div class="size-20 rounded-full flex items-center justify-center shadow-lg" style="background-color: #49197C; ring: 4px solid rgba(255,255,255,0.3);">
+                    <img src="{{ asset('images/Logo.png') }}" alt="VicioApp" width="70" height="70">
                 </div>
-                <div>
+                <div class="text-center">
                     <h1 class="text-2xl font-bold text-white">
-                        Hola, {{ auth()->user()->username ?? auth()->user()->name }} 👋
+                        Hola, {{ auth()->user()->username ?? auth()->user()->name }} 
                     </h1>
-                    <p class="text-zinc-500 text-sm mt-1">Panel de administración</p>
+                    <p class="text-sm mt-1" style="color: rgba(255,255,255,0.65);">Panel de administración</p>
                 </div>
             </div>
 
-            <div class="flex flex-col gap-3 w-full max-w-sm">
-                <p class="text-zinc-500 text-xs font-semibold uppercase tracking-wider text-left">Fiestas</p>
+            {{-- Sección Fiestas --}}
+            <div class="flex flex-col gap-3 w-full">
+                <p class="text-xs font-semibold uppercase tracking-wider" style="color: rgba(255,255,255,0.55);">Fiestas</p>
+
+                {{-- Botón principal: oscuro --}}
                 <a href="/admin/parties" wire:navigate
-                    class="w-full vicio-gradient text-white font-semibold py-4 rounded-2xl flex items-center justify-center gap-3 hover:opacity-90 transition-opacity">
+                    class="w-full text-white font-semibold py-4 rounded-2xl flex items-center justify-center gap-3 transition-opacity hover:opacity-90"
+                    style="background-color: #2d0a3e;">
                     <svg xmlns="http://www.w3.org/2000/svg" class="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                     </svg>
                     Ver todas las fiestas
                 </a>
+
+                {{-- Botón secundario: blanco semitransparente --}}
                 <a href="/admin/parties/create" wire:navigate
-                    class="w-full bg-zinc-900 border border-zinc-800 text-white font-semibold py-4 rounded-2xl flex items-center justify-center gap-3 hover:border-zinc-700 transition-colors">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="size-5 text-vicio-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    class="w-full font-semibold py-4 rounded-2xl flex items-center justify-center gap-3 transition-opacity hover:opacity-90"
+                    style="background-color: rgba(255,255,255,0.25); color: #1a0a2e;">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                     </svg>
                     Crear nueva fiesta
                 </a>
             </div>
 
-            <div class="flex flex-col gap-3 w-full max-w-sm">
-                <p class="text-zinc-500 text-xs font-semibold uppercase tracking-wider text-left">Usuarios</p>
+            {{-- Sección Usuarios --}}
+            <div class="flex flex-col gap-3 w-full">
+                <p class="text-xs font-semibold uppercase tracking-wider" style="color: rgba(255,255,255,0.55);">Usuarios</p>
+
                 <a href="/admin/users" wire:navigate
-                    class="w-full bg-zinc-900 border border-zinc-800 text-white font-semibold py-4 rounded-2xl flex items-center justify-center gap-3 hover:border-zinc-700 transition-colors">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="size-5 text-vicio-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    class="w-full font-semibold py-4 rounded-2xl flex items-center justify-center gap-3 transition-opacity hover:opacity-90"
+                    style="background-color: rgba(255,255,255,0.25); color: #1a0a2e;">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
                     </svg>
                     Gestionar usuarios
@@ -81,7 +88,9 @@ new #[Title('Inicio')] class extends Component
 
         @else
 
-            {{-- ── VISTA USUARIO NORMAL ── --}}
+            {{-- ══════════════════════════════════
+                 VISTA USUARIO NORMAL
+            ══════════════════════════════════ --}}
             @php
                 $userId = auth()->id();
                 $matches = \App\Models\PartyMatch::where('user1_id', $userId)->orWhere('user2_id', $userId)->count();
@@ -96,63 +105,67 @@ new #[Title('Inicio')] class extends Component
                     ->first();
             @endphp
 
-            <div class="flex flex-col items-center gap-3" style="margin-top: 100px">
-                <div class="size-16 rounded-full vicio-gradient flex items-center justify-center shadow-lg">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="size-8 fill-white">
-                        <path d="M12 2C9.5 5 8 7.5 8 10c0 2.2 1.8 4 4 4s4-1.8 4-4c0-.5-.1-1-.2-1.4C17.2 10 18 11.9 18 14c0 3.3-2.7 6-6 6s-6-2.7-6-6c0-4 3-8 6-10zm0 10c-.6 0-1-.4-1-1 0-.9.5-1.8 1-2.5.5.7 1 1.6 1 2.5 0 .6-.4 1-1 1z"/>
-                    </svg>
+            {{-- Avatar + saludo --}}
+            <div class="flex flex-col items-center gap-3 w-full pt-4">
+                <div class="size-20 rounded-full overflow-hidden shadow-lg" style="outline: 3px solid rgba(255,255,255,0.4); outline-offset: 2px;">
+                    <img
+                        src="{{ auth()->user()->profile_photo_url }}"
+                        alt="{{ auth()->user()->username }}"
+                        class="w-full h-full object-cover"
+                    >
                 </div>
-                <div>
+                <div class="text-center">
                     <h1 class="text-2xl font-bold text-white">
                         Hola, {{ auth()->user()->username ?? auth()->user()->name }}
                     </h1>
-                    <p class="text-zinc-500 text-sm mt-1">¿Listo para la noche?</p>
+                    <p class="text-sm mt-1" style="color: rgba(255,255,255,0.65);">¿Listo para la noche?</p>
                 </div>
             </div>
 
             {{-- Stats --}}
-            <div class="grid grid-cols-3 gap-3 w-full max-w-sm">
-                <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 flex flex-col items-center gap-1">
-                    <span class="text-2xl font-bold text-vicio-300">{{ $matches }}</span>
-                    <span class="text-zinc-500 text-xs">Matches</span>
+            <div class="grid grid-cols-3 gap-3 w-full">
+                <div class="rounded-2xl p-4 flex flex-col items-center gap-1" style="background-color: rgba(255,255,255,0.2);">
+                    <span class="text-2xl font-bold text-white">{{ $matches }}</span>
+                    <span class="text-xs font-medium" style="color: rgba(255,255,255,0.65);">Matches</span>
                 </div>
-                <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 flex flex-col items-center gap-1">
-                    <span class="text-2xl font-bold text-vicio-300">{{ $unread }}</span>
-                    <span class="text-zinc-500 text-xs">Sin leer</span>
+                <div class="rounded-2xl p-4 flex flex-col items-center gap-1" style="background-color: rgba(255,255,255,0.2);">
+                    <span class="text-2xl font-bold text-white">{{ $unread }}</span>
+                    <span class="text-xs font-medium" style="color: rgba(255,255,255,0.65);">Sin leer</span>
                 </div>
-                <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 flex flex-col items-center gap-1">
-                    <span class="text-2xl font-bold text-vicio-300">{{ $likes }}</span>
-                    <span class="text-zinc-500 text-xs">Likes</span>
+                <div class="rounded-2xl p-4 flex flex-col items-center gap-1" style="background-color: rgba(255,255,255,0.2);">
+                    <span class="text-2xl font-bold text-white">{{ $likes }}</span>
+                    <span class="text-xs font-medium" style="color: rgba(255,255,255,0.65);">Likes</span>
                 </div>
             </div>
 
             {{-- Acciones --}}
-            <div class="flex flex-col gap-3 w-full max-w-sm">
-
-
+            <div class="flex flex-col gap-3 w-full">
+                <p class="text-xs font-semibold uppercase tracking-wider" style="color: rgba(255,255,255,0.55);">Mis acciones</p>
 
                 {{-- Mis chats --}}
                 <a href="{{ route('chats.index') }}" wire:navigate
-                    class="w-full bg-zinc-900 border border-zinc-800 text-white font-semibold py-4 rounded-2xl flex items-center justify-center gap-3 hover:border-zinc-700 transition-colors">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="size-5 text-vicio-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    class="w-full font-semibold py-4 rounded-2xl flex items-center justify-center gap-3 transition-opacity hover:opacity-90"
+                    style="background-color: rgba(255,255,255,0.25); color: #1a0a2e;">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
                     </svg>
                     Mis chats
                     @if($unread > 0)
-                        <span class="ml-auto size-5 rounded-full bg-vicio text-white text-xs font-bold flex items-center justify-center">{{ $unread }}</span>
+                        <span class="ml-auto size-5 rounded-full text-white text-xs font-bold flex items-center justify-center" style="background-color: #49197C;">{{ $unread }}</span>
                     @endif
                 </a>
 
                 {{-- Editar perfil --}}
                 <a href="{{ route('profile.edit') }}" wire:navigate
-                    class="w-full bg-zinc-900 border border-zinc-800 text-white font-semibold py-4 rounded-2xl flex items-center justify-center gap-3 hover:border-zinc-700 transition-colors">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="size-5 text-vicio-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    class="w-full font-semibold py-4 rounded-2xl flex items-center justify-center gap-3 transition-opacity hover:opacity-90"
+                    style="background-color: rgba(255,255,255,0.25); color: #1a0a2e;">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                     </svg>
                     Editar perfil
                 </a>
 
-                                {{-- Volver a la fiesta --}}
+                {{-- Volver a la fiesta --}}
                 @if($currentParty)
                     @php
                         $partyRoute = $currentParty->status === 'active'
@@ -160,11 +173,11 @@ new #[Title('Inicio')] class extends Component
                             : route('party.waiting', $currentParty->qr_code);
                     @endphp
                     <a href="{{ $partyRoute }}" wire:navigate
-                        class="w-full vicio-gradient text-white font-bold py-4 rounded-2xl flex items-center justify-center gap-3 hover:opacity-90 transition-opacity">
+                        class="w-full text-white font-bold py-4 rounded-2xl flex items-center justify-center gap-3 transition-opacity hover:opacity-90"
+                        style="background-color: #2d0a3e;">
                         <span>{{ $currentParty->status === 'active' ? '🔥 Volver a la fiesta' : '⏳ Sala de espera' }}</span>
                     </a>
                 @endif
-
             </div>
 
         @endif

@@ -6,6 +6,8 @@ Route::view('/', 'welcome')->name('home');
 
 Route::middleware(['auth'])->group(function () {
     Route::view('dashboard', 'dashboard')->name('dashboard');
+    Route::get('parties', [\App\Http\Controllers\PartiesController::class, 'index'])->name('parties');
+
 });
 
 // ── Rutas públicas de fiesta ──

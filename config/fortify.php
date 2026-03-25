@@ -74,9 +74,11 @@ return [
     */
 
     'home' => function () {
-    return session()->has('url.intended')
-        ? session('url.intended')
-        : '/parties';
+    if (auth()->check() && auth()->user()->is_admin) {
+        return '/dashboard';
+    }
+
+    return '/parties';
 },
 
     /*

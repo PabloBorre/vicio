@@ -34,7 +34,7 @@
     <form method="GET" action="{{ route('admin.users.index') }}" class="shrink-0" style="padding: 16px 16px 0 16px;">
         {{-- Buscador --}}
         <div class="relative" style="margin-bottom: 10px;">
-            <svg xmlns="http://www.w3.org/2000/svg" class="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color: rgba(255,255,255,0.5);">
+            <svg xmlns="http://www.w3.org/2000/svg" class="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color: rgba(255,255,255,0.5);margin-left: 10px;  ">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
             </svg>
             <input type="text" name="search" value="{{ request('search') }}"
@@ -62,7 +62,7 @@
     @isset($party)
         <div class="flex items-center justify-between rounded-2xl px-4 py-2.5"
             style="margin: 10px 16px 0 16px; background-color: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.2);">
-            <span class="text-white text-xs font-medium">🎉 {{ $party->name }}</span>
+            <span class="text-white text-xs font-medium"> {{ $party->name }}</span>
             <a href="{{ route('admin.users.index') }}" wire:navigate class="text-xs" style="color: rgba(255,255,255,0.5);">✕ Quitar</a>
         </div>
     @endisset
@@ -103,7 +103,7 @@
                             @endif
                         </div>
                         @if($user->currentParty)
-                            <p class="text-xs truncate mt-0.5" style="color: rgba(255,255,255,0.6);">🎉 {{ $user->currentParty->name }}</p>
+                            <p class="text-xs truncate mt-0.5" style="color: rgba(255,255,255,0.6);"> {{ $user->currentParty->name }}</p>
                         @else
                             <p class="text-xs mt-0.5" style="color: rgba(255,255,255,0.35);">Sin fiesta activa</p>
                         @endif

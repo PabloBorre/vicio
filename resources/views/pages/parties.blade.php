@@ -83,14 +83,37 @@
 
                         {{-- CTA: unirse --}}
                         <div class="mt-4">
-                            <p class="text-xs text-center mb-2" style="color: rgba(255,255,255,0.5);">Para entrar, escanea el QR de la fiesta</p>
-                            <div class="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-semibold text-sm"
-                                style="background-color: rgba(255,255,255,0.1); color: rgba(255,255,255,0.5);">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/>
-                                </svg>
-                                Escanea el QR para entrar
-                            </div>
+                            @auth
+                                @php $alreadyIn = auth()->user()->parties()->where('party_id', $active->id)->exists(); @endphp
+                                @if($alreadyIn)
+                                    <a href="{{ route('party.register', $active->qr_code) }}"
+                                       class="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-semibold text-sm text-white transition-opacity hover:opacity-90"
+                                       style="background-color: #49197C;">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 9l3 3m0 0l-3 3m3-3H8m13 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                        </svg>
+                                        Volver a la fiesta
+                                    </a>
+                                @else
+                                    <button onclick="openQrScanner()"
+                                        class="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-semibold text-sm text-white transition-opacity hover:opacity-90"
+                                        style="background-color: #49197C;">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/>
+                                        </svg>
+                                        Escanear QR para entrar
+                                    </button>
+                                @endif
+                            @else
+                                <button onclick="openQrScanner()"
+                                    class="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-semibold text-sm text-white transition-opacity hover:opacity-90"
+                                    style="background-color: #49197C;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/>
+                                    </svg>
+                                    Escanear QR para entrar
+                                </button>
+                            @endauth
                         </div>
                     </div>
                 </div>
@@ -226,6 +249,126 @@
 @auth
     <livewire:auth.ban-watcher />
 @endauth
+
+{{-- ── MODAL ESCÁNER QR ── --}}
+<div id="qr-modal" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/90 backdrop-blur-sm" style="display:none!important;">
+    <div class="w-full max-w-[360px] mx-4 rounded-3xl overflow-hidden" style="background-color: #1a0a2e;">
+
+        {{-- Header modal --}}
+        <div class="flex items-center justify-between px-5 py-4" style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+            <h2 class="text-white font-bold text-base">Escanear QR</h2>
+            <button onclick="closeQrScanner()" class="size-8 rounded-full flex items-center justify-center" style="background-color: rgba(255,255,255,0.1);">
+                <svg xmlns="http://www.w3.org/2000/svg" class="size-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+
+        {{-- Visor cámara --}}
+        <div class="relative" style="aspect-ratio: 1;">
+            <video id="qr-video" class="w-full h-full object-cover" playsinline autoplay muted></video>
+            <canvas id="qr-canvas" class="hidden"></canvas>
+
+            {{-- Overlay con marco --}}
+            <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                <div class="relative" style="width: 200px; height: 200px;">
+                    {{-- Esquinas del marco --}}
+                    <div class="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-white rounded-tl-lg"></div>
+                    <div class="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-white rounded-tr-lg"></div>
+                    <div class="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-white rounded-bl-lg"></div>
+                    <div class="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-white rounded-br-lg"></div>
+                    {{-- Línea de escaneo animada --}}
+                    <div id="qr-scanline" class="absolute left-2 right-2" style="height: 2px; background: #49197C; box-shadow: 0 0 8px #49197C; top: 0; animation: scanline 2s linear infinite;"></div>
+                </div>
+            </div>
+
+            {{-- Mensaje de estado --}}
+            <div class="absolute bottom-0 left-0 right-0 px-4 py-3 text-center" style="background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);">
+                <p id="qr-status" class="text-white text-sm font-medium">Apunta al código QR de la fiesta</p>
+            </div>
+        </div>
+
+        {{-- Footer modal --}}
+        <div class="px-5 py-4 text-center">
+            <p class="text-xs" style="color: rgba(255,255,255,0.4);">El QR lo tiene el organizador de la fiesta</p>
+        </div>
+    </div>
+</div>
+
+<style>
+    @keyframes scanline {
+        0%   { top: 0; }
+        50%  { top: calc(100% - 2px); }
+        100% { top: 0; }
+    }
+    #qr-modal.active { display: flex !important; }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+<script>
+    let qrStream = null;
+    let qrAnimFrame = null;
+
+    function openQrScanner() {
+        document.getElementById('qr-modal').classList.add('active');
+        startCamera();
+    }
+
+    function closeQrScanner() {
+        document.getElementById('qr-modal').classList.remove('active');
+        stopCamera();
+    }
+
+    async function startCamera() {
+        const video = document.getElementById('qr-video');
+        document.getElementById('qr-status').textContent = 'Apunta al código QR de la fiesta';
+        try {
+            qrStream = await navigator.mediaDevices.getUserMedia({
+                video: { facingMode: 'environment' }
+            });
+            video.srcObject = qrStream;
+            video.play();
+            video.addEventListener('loadedmetadata', scanFrame);
+        } catch (err) {
+            document.getElementById('qr-status').textContent = 'No se pudo acceder a la cámara';
+        }
+    }
+
+    function stopCamera() {
+        if (qrStream) {
+            qrStream.getTracks().forEach(t => t.stop());
+            qrStream = null;
+        }
+        if (qrAnimFrame) {
+            cancelAnimationFrame(qrAnimFrame);
+            qrAnimFrame = null;
+        }
+    }
+
+    function scanFrame() {
+        const video  = document.getElementById('qr-video');
+        const canvas = document.getElementById('qr-canvas');
+        if (video.readyState !== video.HAVE_ENOUGH_DATA) {
+            qrAnimFrame = requestAnimationFrame(scanFrame);
+            return;
+        }
+        canvas.width  = video.videoWidth;
+        canvas.height = video.videoHeight;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const code = jsQR(imageData.data, imageData.width, imageData.height, {
+            inversionAttempts: 'dontInvert'
+        });
+        if (code && code.data) {
+            document.getElementById('qr-status').textContent = '✓ QR detectado, redirigiendo...';
+            stopCamera();
+            window.location.href = code.data;
+            return;
+        }
+        qrAnimFrame = requestAnimationFrame(scanFrame);
+    }
+</script>
 
 @fluxScripts
 </body>

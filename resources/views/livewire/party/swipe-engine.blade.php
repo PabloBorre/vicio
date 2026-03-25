@@ -15,8 +15,11 @@
         showMatch: @entangle('lastMatch').live,
         showMenu: false,
 
+        flying: false,
+
         get cardStyle() {
-            return `transform: translate(${this.currentX}px, ${this.currentY}px) rotate(${this.rotation}deg); opacity: ${this.opacity}; transition: ${this.dragging ? 'none' : 'transform 0.3s, opacity 0.3s'}`;
+            const tr = (this.dragging || this.flying) ? 'none' : 'transform 0.3s, opacity 0.3s';
+            return `transform: translate(${this.currentX}px, ${this.currentY}px) rotate(${this.rotation}deg); opacity: ${this.opacity}; transition: ${tr}`;
         },
 
         startDrag(e) {

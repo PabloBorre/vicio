@@ -52,7 +52,7 @@
                 </p>
             @endif
             <p class="text-sm" style="color: rgba(255,255,255,0.7);">
-                📅 {{ $party->starts_at->format('d M Y · H:i') }}
+                {{ $party->starts_at->format('d M Y · H:i') }}
             </p>
 
             {{-- Badge estado --}}

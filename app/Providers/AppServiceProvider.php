@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
+use App\Models\Party;
+use App\Observers\PartyObserver;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -21,10 +23,10 @@ class AppServiceProvider extends ServiceProvider
     /**
      * Bootstrap any application services.
      */
-    public function boot(): void
-    {
-        $this->configureDefaults();
-    }
+public function boot(): void
+{
+    Party::observe(PartyObserver::class);
+}
 
     /**
      * Configure default behaviors for production-ready applications.

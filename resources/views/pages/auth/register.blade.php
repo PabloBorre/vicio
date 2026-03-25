@@ -7,7 +7,7 @@
 
         {{-- ── HEADER ── --}}
         <div class="flex items-center justify-between px-5 pt-6 pb-2">
-            <a href={{ route('home') }}><img src="{{ asset('images/Logo.png') }}" alt="VicioApp" width="70" height="70"></a>
+            <a href="{{ route('home') }}"><img src="{{ asset('images/Logo.png') }}" alt="VicioApp" width="70" height="70"></a>
             <span class="text-white font-bold text-lg tracking-tight">VicioApp</span>
         </div>
 

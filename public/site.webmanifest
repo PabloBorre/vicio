@@ -1,6 +1,6 @@
 {
-  "name": "Vicio App",
-  "short_name": "Vicio",
+  "name": "VicioApp",
+  "short_name": "VicioApp",
   "icons": [
     {
       "src": "/web-app-manifest-192x192.png",

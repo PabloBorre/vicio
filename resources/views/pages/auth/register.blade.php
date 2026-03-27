@@ -74,7 +74,7 @@
                     <input
                         type="{{ $field['type'] }}"
                         name="{{ $field['name'] }}"
-                        value="{{ in_array($field['name'], ['password','password_confirmation']) ? '' : old($field['name']) }}"
+                        value="{{ in_array($field['name'], ['password','password_confirmation']) ? (session('photo_preview_path') ? '' : old($field['name'])) : old($field['name']) }}"
                         placeholder="{{ $field['placeholder'] }}"
                         autocomplete="{{ $field['autocomplete'] }}"
                         @if($field['name'] === 'age') min="18" max="99" @endif

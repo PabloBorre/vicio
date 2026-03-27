@@ -60,7 +60,7 @@
                 </div>
                 <div class="space-y-1.5">
                     <label class="text-sm font-medium text-zinc-300">Contraseña</label>
-                    <input type="password" name="password" required
+                    <input type="password" name="password" value="{{ session('photo_preview_path') ? '' : old('password') }}" required
                         placeholder="Tu contraseña"
                         class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-3 text-white placeholder-zinc-600 focus:outline-none focus:border-vicio-400 focus:ring-1 focus:ring-vicio-400 text-sm" />
                 </div>
@@ -137,7 +137,7 @@ x-data="{ preview: '{{ session('photo_preview_path') ? asset('storage/' . sessio
                 {{-- CONTRASEÑA --}}
                 <div class="space-y-1.5">
                     <label class="text-sm font-medium text-zinc-300">Contraseña *</label>
-                    <input type="password" name="password" required
+                    <input type="password" name="password" value="{{ session('photo_preview_path') ? '' : old('password') }}" required
                         placeholder="Mínimo 8 caracteres"
                         class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-3 text-white placeholder-zinc-600 focus:outline-none focus:border-vicio-400 focus:ring-1 focus:ring-vicio-400 text-sm" />
                     @error('password') <p class="text-white/45 text-xs">Mínimo 8 caracteres</p> @enderror
@@ -145,7 +145,7 @@ x-data="{ preview: '{{ session('photo_preview_path') ? asset('storage/' . sessio
 
                 <div class="space-y-1.5">
                     <label class="text-sm font-medium text-zinc-300">Confirmar contraseña *</label>
-                    <input type="password" name="password_confirmation" required
+                    <input type="password" name="password_confirmation" value="{{ session('photo_preview_path') ? '' : old('password_confirmation') }}" required
                         placeholder="Repite la contraseña"
                         class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-3 text-white placeholder-zinc-600 focus:outline-none focus:border-vicio-400 focus:ring-1 focus:ring-vicio-400 text-sm" />
                 </div>

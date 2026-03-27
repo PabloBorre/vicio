@@ -211,8 +211,7 @@
                     </div>
 
                     {{-- Gradiente overlay --}}
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/10 to-transparent"></div>
-
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent"></div>
                     {{-- Badge LIKE --}}
                     <div
                         x-show="showLike"
@@ -244,19 +243,19 @@
                     </div>
 
                     {{-- Info usuario (abajo de la tarjeta) --}}
-                    <div class="absolute bottom-0 left-0 right-0 px-6 pb-6 pt-16">
-                        <h2 class="text-white font-bold text-3xl leading-tight drop-shadow">
-                            {{ $currentCard['username'] }}
-                            @if($currentCard['age'])
-                                <span class="font-light text-white/90"> {{ $currentCard['age'] }}</span>
-                            @endif
-                        </h2>
-                        @if($currentCard['bio'])
-                            <p class="text-white/80 text-sm mt-1 pb-4 leading-snug line-clamp-2 drop-shadow">
-                                {{ $currentCard['bio'] }}
-                            </p>
-                        @endif
-                    </div>
+<div class="absolute bottom-0 left-0 right-0 px-6 pb-6 pt-24">
+    <h2 class="text-white font-bold text-3xl leading-tight drop-shadow">
+        {{ $currentCard['username'] }}
+        @if($currentCard['age'])
+            <span class="font-light text-white/90">, {{ $currentCard['age'] }}</span>
+        @endif
+    </h2>
+    @if($currentCard['bio'])
+        <p class="text-white/75 text-sm mt-2 leading-relaxed line-clamp-4 drop-shadow">
+            {{ $currentCard['bio'] }}
+        </p>
+    @endif
+</div>
                 </div>
             @endif
 

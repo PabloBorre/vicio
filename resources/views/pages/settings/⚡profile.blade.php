@@ -114,7 +114,7 @@ new #[Title('Editar perfil')] class extends Component {
 <head>
     @include('partials.head')
 </head>
-<body style="margin:0; padding:0; background-color: #A678C8;">
+<body style="margin:0; padding:0; background-color: #A678C8;max-width: 430px; margin:auto" >
 
 <div class="w-full max-w-[430px] mx-auto flex flex-col" style="min-height: 100dvh; background-color: #A678C8;">
 

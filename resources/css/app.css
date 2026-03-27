@@ -150,10 +150,12 @@ select:focus[data-flux-control] {
 }
 
 /* ── Mobile frame — max-width móvil centrado ── */
+/* ── Mobile frame — max-width móvil centrado ── */
 body {
     display: flex;
     justify-content: center;
     min-height: 100dvh;
+    max-width: 470px !important;
     background-color: #5C2090;
 }
 

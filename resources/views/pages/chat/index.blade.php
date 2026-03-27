@@ -3,7 +3,7 @@
 <head>
     @include('partials.head')
 </head>
-<body class="overflow-hidden" style="background-color: #A678C8;">
+<body class="overflow-hidden" style="background-color: #A678C8;max-width: 430px; margin:auto"">
 
 <livewire:chat.chat-list />
 

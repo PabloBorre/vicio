@@ -96,8 +96,7 @@
         <img
             src="{{ $match['profile_photo_url'] }}"
             alt="{{ $match['username'] }}"
-            style="width: 50px; height: 52px; border-radius: 9999px;"
-        />
+style="width: 52px; height: 52px; border-radius: 9999px; object-fit: cover;"        />
         @if($match['unread'] > 0)
             <span class="absolute -top-0.5 -right-0.5 flex items-center justify-center text-white font-bold"
                 style="width: 18px; height: 18px; border-radius: 9999px; background-color: #49197C; font-size: 10px;">

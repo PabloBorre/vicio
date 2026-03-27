@@ -3,7 +3,7 @@
 <head>
     @include('partials.head')
 </head>
-<body class="bg-zinc-950 overflow-hidden">
+<body class="bg-zinc-950 overflow-hidden" style="max-width: 430px; margin:auto"">
 
 <livewire:chat.chat-conversation :match="$match" />
 <livewire:chat.chat-notification :currentMatchId="$match->id" />

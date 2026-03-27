@@ -140,7 +140,7 @@
                     <input type="password" name="password" required
                         placeholder="Mínimo 8 caracteres"
                         class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-3 text-white placeholder-zinc-600 focus:outline-none focus:border-vicio-400 focus:ring-1 focus:ring-vicio-400 text-sm" />
-                    @error('password') <p class="text-red-400 text-xs">{{ $message }}</p> @enderror
+                    @error('password') <p class="text-white/45 text-xs">Mínimo 8 caracteres</p> @enderror
                 </div>
 
                 <div class="space-y-1.5">

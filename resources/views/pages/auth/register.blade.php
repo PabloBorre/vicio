@@ -3,7 +3,7 @@
 <head>
     @include('partials.head')
 </head>
-<body class="min-h-screen antialiased" style="background-color: #A678C8 !important">
+<body class="min-h-screen antialiased" style="background-color: #A678C8 !important;max-width: 430px; margin:auto"">
 
         {{-- ── HEADER ── --}}
         <div class="flex items-center justify-between px-5 pt-6 pb-2">
@@ -95,6 +95,9 @@
                     @error($field['name'])
                         <p class="text-red-200 text-xs mt-1 px-4">{{ $message }}</p>
                     @enderror
+                    @if($field['name'] === 'password')
+                        <p class="text-xs mt-1 px-4 text-white/45">Mínimo 8 caracteres</p>
+                    @endif
                 </div>
             @endforeach
 

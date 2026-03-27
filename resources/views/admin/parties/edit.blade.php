@@ -19,6 +19,16 @@
             <h1 class="text-white font-bold text-xl leading-tight truncate">{{ $party->name }}</h1>
             <p class="text-xs font-mono truncate" style="color: rgba(255,255,255,0.5);">{{ $party->qr_code }}</p>
         </div>
+        <form method="POST" action="{{ route('logout') }}" class="shrink-0">
+        @csrf
+        <button type="submit"
+            class="size-9 rounded-full flex items-center justify-center transition-opacity hover:opacity-80"
+            style="background-color: rgba(255,255,255,0.2);">
+            <svg xmlns="http://www.w3.org/2000/svg" class="size-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+            </svg>
+        </button>
+    </form>
     </div>
 
     {{-- Contenido scrollable --}}

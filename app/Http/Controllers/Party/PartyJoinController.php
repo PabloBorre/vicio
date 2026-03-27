@@ -15,9 +15,11 @@ class PartyJoinController extends Controller
 {
     private function redirectIfFinished(): \Illuminate\Http\RedirectResponse
     {
-        return auth()->check()
+        if (!auth()->check()) return redirect()->route('home');
+        
+        return auth()->user()->is_admin
             ? redirect()->route('dashboard')
-            : redirect()->route('home');
+            : redirect()->route('parties');
     }
 
     public function show(string $qr)

@@ -3,7 +3,7 @@
 <head>
     @include('partials.head')
 </head>
-<body class="min-h-screen antialiased" style="background-color: #A678C8 !important">
+<body class="min-h-screen antialiased" style="background-color: #A678C8 !important; max-width: 430px; margin:auto"">
     <div class="flex flex-col items-center justify-between min-h-screen px-6" style="padding-top: 80px; padding-bottom: 56px;">
 
         {{-- Logo arriba --}}

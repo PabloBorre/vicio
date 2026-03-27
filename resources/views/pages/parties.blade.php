@@ -81,39 +81,16 @@
                             <p class="text-xs mt-3 leading-relaxed" style="color: rgba(255,255,255,0.6);">{{ Str::limit($active->description, 100) }}</p>
                         @endif
 
-                        {{-- CTA: unirse --}}
+                        {{-- CTA: ir a la fiesta --}}
                         <div class="mt-4">
-                            @auth
-                                @php $alreadyIn = auth()->user()->parties()->where('party_id', $active->id)->exists(); @endphp
-                                @if($alreadyIn)
-                                    <a href="{{ route('party.register', $active->qr_code) }}"
-                                       class="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-semibold text-sm text-white transition-opacity hover:opacity-90"
-                                       style="background-color: #49197C;">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 9l3 3m0 0l-3 3m3-3H8m13 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                        </svg>
-                                        Volver a la fiesta
-                                    </a>
-                                @else
-                                    <button onclick="openQrScanner()"
-                                        class="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-semibold text-sm text-white transition-opacity hover:opacity-90"
-                                        style="background-color: #49197C;">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/>
-                                        </svg>
-                                        Escanear QR para entrar
-                                    </button>
-                                @endif
-                            @else
-                                <button onclick="openQrScanner()"
-                                    class="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-semibold text-sm text-white transition-opacity hover:opacity-90"
-                                    style="background-color: #49197C;">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/>
-                                    </svg>
-                                    Escanear QR para entrar
-                                </button>
-                            @endauth
+                            <a href="{{ route('party.register', $active->qr_code) }}"
+                               class="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-semibold text-sm text-white transition-opacity hover:opacity-90"
+                               style="background-color: #49197C;">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 9l3 3m0 0l-3 3m3-3H8m13 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                Ir a la fiesta
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -324,11 +301,11 @@
         document.getElementById('qr-status').textContent = 'Apunta al código QR de la fiesta';
         try {
             qrStream = await navigator.mediaDevices.getUserMedia({
-                video: { facingMode: 'environment' }
+            video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } }
             });
             video.srcObject = qrStream;
-            video.play();
-            video.addEventListener('loadedmetadata', scanFrame);
+            await.video.play();
+            scanFrame();
         } catch (err) {
             document.getElementById('qr-status').textContent = 'No se pudo acceder a la cámara';
         }
@@ -346,12 +323,12 @@
     }
 
     function scanFrame() {
-        const video  = document.getElementById('qr-video');
-        const canvas = document.getElementById('qr-canvas');
-        if (video.readyState !== video.HAVE_ENOUGH_DATA) {
-            qrAnimFrame = requestAnimationFrame(scanFrame);
-            return;
-        }
+    if (!qrScanning) return;
+
+    const video  = document.getElementById('qr-video');
+    const canvas = document.getElementById('qr-canvas');
+
+    if (video.readyState === video.HAVE_ENOUGH_DATA) {
         canvas.width  = video.videoWidth;
         canvas.height = video.videoHeight;
         const ctx = canvas.getContext('2d');
@@ -360,14 +337,23 @@
         const code = jsQR(imageData.data, imageData.width, imageData.height, {
             inversionAttempts: 'dontInvert'
         });
+
         if (code && code.data) {
-            document.getElementById('qr-status').textContent = '✓ QR detectado, redirigiendo...';
-            stopCamera();
-            window.location.href = code.data;
+            // Extraer el QR code de la URL y forzar ruta /register
+            const match = code.data.match(/\/party\/([^\/]+)/);
+            if (match) {
+                document.getElementById('qr-status').textContent = '✓ QR detectado, entrando...';
+                stopCamera();
+                window.location.href = '/party/' + match[1] + '/register';
+            } else {
+                document.getElementById('qr-status').textContent = 'QR no válido para VicioApp';
+            }
             return;
         }
-        qrAnimFrame = requestAnimationFrame(scanFrame);
     }
+
+    qrAnimFrame = requestAnimationFrame(scanFrame);
+}
 </script>
 
 @fluxScripts

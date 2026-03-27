@@ -317,6 +317,7 @@
                 </div>
                 <div class="flex flex-col gap-3 w-full max-w-xs">
                     <button
+                        href="{{ route('chats.index') }}"
                         wire:click="dismissMatch"
                         class="w-full vicio-gradient text-white font-bold py-4 rounded-2xl hover:opacity-90 transition-opacity">
                         💬 Enviar mensaje

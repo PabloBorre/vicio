@@ -16,7 +16,7 @@ class PartyJoinController extends Controller
     private function redirectIfFinished(): \Illuminate\Http\RedirectResponse
     {
         if (!auth()->check()) return redirect()->route('home');
-        
+
         return auth()->user()->is_admin
             ? redirect()->route('dashboard')
             : redirect()->route('parties');
@@ -75,11 +75,24 @@ class PartyJoinController extends Controller
 
     public function store(Request $request, string $qr)
     {
+        \Log::info('STORE LLAMADO', [
+    'has_file' => $request->hasFile('profile_photo'),
+    'is_valid' => $request->hasFile('profile_photo') ? $request->file('profile_photo')->isValid() : false,
+]);
         $party = Party::where('qr_code', $qr)->firstOrFail();
 
         if ($party->status === 'finished') {
             return $this->redirectIfFinished();
         }
+
+        // Flashear foto a sesión para restaurar preview si la validación falla
+// Guardar foto temporal en disco si la validación va a fallar
+if ($request->hasFile('profile_photo') && $request->file('profile_photo')->isValid()) {
+    $file = $request->file('profile_photo');
+    $tmpName = 'tmp_' . uniqid() . '.' . $file->getClientOriginalExtension();
+    $file->storeAs('temp-photos', $tmpName, 'public');
+    session()->flash('photo_preview_path', 'temp-photos/' . $tmpName);
+}
 
         $request->validate([
             'name'               => ['required', 'string', 'max:255'],
@@ -113,6 +126,11 @@ class PartyJoinController extends Controller
         ]);
 
         $photoPath = ImageHelper::storeAsWebP($request->file('profile_photo'));
+
+        // Borrar foto temporal si existía
+if (session()->has('photo_preview_path')) {
+    \Storage::disk('public')->delete(session()->pull('photo_preview_path'));
+}
         $user = User::create([
             'name'               => $request->name,
             'username'           => $request->username,

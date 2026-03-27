@@ -66,48 +66,48 @@
     </div>
 
     {{-- OVERLAY PERFIL --}}
-    <div
+<div
     x-show="showProfile"
     x-transition
-    class="absolute inset-0 z-50 overflow-y-auto"
+    class="absolute inset-0 z-50 flex flex-col"
     style="display:none; background-color: #4A1A6B;"
 >
-        {{-- Foto --}}
-        <div class="relative shrink-0" style="height: 55dvh; min-height: 160px;">
-            <img src="{{ $other->profile_photo_url }}" class="w-full h-full object-cover" alt="{{ $other->username ?? $other->name }}" />
-            <div class="absolute inset-x-0 bottom-0 h-32" style="background: linear-gradient(to top, #4A1A6B, transparent);"></div>
-            <button type="button" @click="showProfile = false"
-                class="absolute top-4 left-4 size-9 rounded-full flex items-center justify-center text-white"
-                style="background-color: rgba(0,0,0,0.5);">
-                <svg xmlns="http://www.w3.org/2000/svg" class="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/>
-                </svg>
-            </button>
-        </div>
+    {{-- Foto --}}
+    <div class="relative flex-1" style="min-height: 160px;">
+        <img src="{{ $other->profile_photo_url }}" class="w-full h-full object-cover" alt="{{ $other->username ?? $other->name }}" />
+        <div class="absolute inset-x-0 bottom-0 h-32" style="background: linear-gradient(to top, #4A1A6B, transparent);"></div>
+        <button type="button" @click="showProfile = false"
+            class="absolute top-4 left-4 size-9 rounded-full flex items-center justify-center text-white"
+            style="background-color: rgba(0,0,0,0.5);">
+            <svg xmlns="http://www.w3.org/2000/svg" class="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/>
+            </svg>
+        </button>
+    </div>
 
-        {{-- Óvalo nombre --}}
-        <div class="relative px-4 shrink-0" style="z-index: 10; margin-top: -36px;">
-            <div class="flex items-center gap-4" style="background-color: #2D0A4E; border-radius: 9999px; padding: 10px 24px 10px 10px;">
-                <img src="{{ $other->profile_photo_url }}" alt="{{ $other->username ?? $other->name }}"
-                    style="width: 48px; height: 48px; border-radius: 9999px; object-fit: cover; outline: 2px solid rgba(255,255,255,0.3); outline-offset: 1px; flex-shrink: 0;" />
-                <div class="min-w-0">
-                    <p class="text-white font-bold truncate" style="font-size: 18px;">
-                        {{ $other->username ?? $other->name }}
-                        @if($other->age)
-                            <span class="font-light text-purple-300">, {{ $other->age }}</span>
-                        @endif
-                    </p>
-                </div>
+    {{-- Óvalo nombre --}}
+    <div class="relative px-4 shrink-0" style="z-index: 10; margin-top: -36px;">
+        <div class="flex items-center gap-4" style="background-color: #2D0A4E; border-radius: 9999px; padding: 10px 24px 10px 10px;">
+            <img src="{{ $other->profile_photo_url }}" alt="{{ $other->username ?? $other->name }}"
+                style="width: 48px; height: 48px; border-radius: 9999px; object-fit: cover; outline: 2px solid rgba(255,255,255,0.3); outline-offset: 1px; flex-shrink: 0;" />
+            <div class="min-w-0">
+                <p class="text-white font-bold truncate" style="font-size: 18px;">
+                    {{ $other->username ?? $other->name }}
+                    @if($other->age)
+                        <span class="font-light text-purple-300">, {{ $other->age }}</span>
+                    @endif
+                </p>
             </div>
         </div>
+    </div>
 
-        {{-- Bio --}}
-<div class="px-5 pt-4 pb-6 shrink-0" style="background-color: #4A1A6B;">              @if($other->bio)
-                <p class="text-purple-200 leading-relaxed" style="font-size: 15px;">{{ $other->bio }}</p>
-            @else
-                <p class="text-purple-400 text-sm italic">Sin descripción.</p>
-            @endif
-        </div>
+    {{-- Bio --}}
+    <div class="px-5 pt-5 pb-16 shrink-0" style="background-color: #4A1A6B;">
+        @if($other->bio)
+            <p class="text-purple-200 leading-relaxed" style="font-size: 15px;">{{ $other->bio }}</p>
+        @else
+            <p class="text-purple-400 text-sm italic">Sin descripción.</p>
+        @endif
     </div>
 
 </div>

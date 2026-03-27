@@ -21,8 +21,9 @@ Route::prefix('party')->name('party.')->group(function () {
         ->name('register');
 
     // POST: procesar creación de cuenta + unirse a la fiesta
-    Route::post('{qr}/register', [\App\Http\Controllers\Party\PartyJoinController::class, 'store'])
-        ->name('store');
+Route::post('{qr}/register', [\App\Http\Controllers\Party\PartyJoinController::class, 'store'])
+    ->middleware(\App\Http\Middleware\FlashPhotoOnRegister::class)
+    ->name('store');
 
     Route::get('{qr}/waiting', [\App\Http\Controllers\Party\PartyJoinController::class, 'waiting'])
         ->middleware('auth')

@@ -83,11 +83,11 @@
                     <label class="text-sm font-medium text-zinc-300">Foto de perfil *</label>
                     <div class="flex flex-col items-center gap-3">
                         <div class="relative w-24 h-24 rounded-full overflow-hidden bg-zinc-800 border-2 border-zinc-700 flex items-center justify-center"
-                            x-data="{ preview: null }">
-                            <img x-show="preview" :src="preview" class="w-full h-full object-cover" />
-                            <svg x-show="!preview" class="w-10 h-10 text-zinc-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                            </svg>
+x-data="{ preview: '{{ session('photo_preview_path') ? asset('storage/' . session('photo_preview_path')) : '' }}' }">
+    <img x-show="preview" :src="preview" class="w-full h-full object-cover" />
+    <svg x-show="!preview" class="w-10 h-10 text-zinc-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+    </svg>
                             <label class="absolute inset-0 cursor-pointer flex items-end justify-center pb-2">
                                 <span class="bg-black/60 text-white text-xs px-2 py-0.5 rounded-full">Cambiar</span>
                                 <input type="file" name="profile_photo" accept="image/*" class="hidden"

@@ -9,3 +9,12 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 Schedule::command('parties:update-statuses')->everyMinute();
+
+Schedule::call(function () {
+    $files = \Storage::disk('public')->files('temp-photos');
+    foreach ($files as $file) {
+        if (\Storage::disk('public')->lastModified($file) < now()->subHours(2)->timestamp) {
+            \Storage::disk('public')->delete($file);
+        }
+    }
+})->hourly();

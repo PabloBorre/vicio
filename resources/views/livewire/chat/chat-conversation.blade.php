@@ -135,28 +135,31 @@
             </button>
         </div>
 
-        {{-- Panel datos --}}
-        <div class="shrink-0 px-5 pt-5 pb-8 space-y-4" style="background-color: #4A1A6B;">
-            <div class="flex items-start justify-between gap-3">
-                <div>
-                    <h2 class="text-white text-2xl font-bold">
+        {{-- Óvalo con nombre (flotando entre foto y panel) --}}
+        <div class="relative px-4" style="z-index: 10; margin-top: -36px; margin-bottom: 0;">
+            <div class="flex items-center gap-4" style="background-color: #2D0A4E; border-radius: 9999px; padding: 10px 24px 10px 10px;">
+                <img
+                    src="{{ $other->profile_photo_url }}"
+                    alt="{{ $other->username ?? $other->name }}"
+                    style="width: 48px; height: 48px; border-radius: 9999px; object-fit: cover; outline: 2px solid rgba(255,255,255,0.3); outline-offset: 1px; flex-shrink: 0;"
+                />
+                <div class="min-w-0">
+                    <p class="text-white font-bold truncate" style="font-size: 18px;">
                         {{ $other->username ?? $other->name }}
                         @if($other->age)
-                            <span class="text-purple-300 font-light">, {{ $other->age }}</span>
+                            <span class="font-light text-purple-300">, {{ $other->age }}</span>
                         @endif
-                    </h2>
-                    @if($match->party)
-                        <p class="text-purple-400 text-xs mt-1">🎉 {{ $match->party->name }}</p>
-                    @endif
+                    </p>
                 </div>
-                <span class="px-3 py-1.5 rounded-full text-xs font-semibold text-purple-200" style="background-color: rgba(255,255,255,0.1);">
-                    ✨ Match
-                </span>
             </div>
-            @if($other->bio)
-                <p class="text-purple-200 text-sm leading-relaxed">{{ $other->bio }}</p>
-            @endif
         </div>
+
+        {{-- Panel bio --}}
+        @if($other->bio)
+            <div class="shrink-0 px-5 pt-4 pb-8 " style="background-color: #4A1A6B;min-height:300px; padding-top:20px">
+                <p class="text-purple-200 text-sm leading-relaxed">{{ $other->bio }}</p>
+            </div>
+        @endif
     </div>
 
 </div>

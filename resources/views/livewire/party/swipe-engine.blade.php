@@ -148,7 +148,7 @@
                 style="display: none;"
             >
                 
-                <a    href="{{ route('dashboard') }}"
+                <a    href="{{ route('profile.edit') }}"
                     wire:navigate
                     class="w-full text-center px-6 py-4 rounded-2xl font-semibold text-lg whitespace-nowrap shadow-lg transition-colors"
                     style="background: #f5f0eb; color: #49197C;"
@@ -176,15 +176,8 @@
         @if($noMoreCards)
             {{-- Sin más perfiles --}}
             <div class="flex flex-col items-center justify-center w-full gap-5 text-center px-6">
-                <div class="size-24 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center">
-                    <span class="text-5xl">👀</span>
-                </div>
                 <div class="space-y-2">
-                    <p class="text-white font-semibold text-xl">Nadie por aquí aún</p>
-                    <p class="text-zinc-500 text-sm leading-relaxed">
-                        Estás a la espera de que lleguen personas<br>de tu gusto a la fiesta.<br>
-                        <span class="text-zinc-600">Vuelve a comprobarlo en unos minutos.</span>
-                    </p>
+                    <p class="text-white font-semibold" style="font-size: 100px">Espera,<br> alguien <br> caerá</p>
                 </div>
                 <button wire:click="reload"
                         class="mt-2 px-6 py-2.5 rounded-xl bg-zinc-800 text-zinc-300 text-sm font-medium hover:bg-zinc-700 transition-colors">
